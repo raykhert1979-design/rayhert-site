@@ -733,7 +733,7 @@
 
   /* Куда отправлять заявки. Пока пусто — форма работает в ручном режиме:
      собирает текст, копирует его и предлагает отправить в MAX / Telegram / почтой. */
-  var ENDPOINT = "";
+  var ENDPOINT = "https://formsubmit.co/ajax/rajhert2018@yandex.ru";
 
   /* Контакты для ручного режима — подставим, когда будут известны. */
   var MAX_LINK = "";
@@ -785,7 +785,10 @@
       estimate: estimate(),
       utm: utm(),
       page: location.href,
-      sent: new Date().toISOString()
+      sent: new Date().toISOString(),
+      _subject: "Заявка с сайта студии Артёма Райхерта",
+      _template: "table",
+      _captcha: "false"
     };
   }
 
