@@ -877,11 +877,14 @@
       body: JSON.stringify(data)
     }).then(function(r){
       if(!r.ok) throw new Error("HTTP " + r.status);
+      return r.json().catch(function(){ return {success:"true"}; });
+    }).then(function(res){
+      if(res && String(res.success) === "false") throw new Error(res.message || "not active");
       status.textContent = "Заявка отправлена. Ответим в течение рабочего дня.";
       form.reset();
       fallback.style.display = "none";
     }).catch(function(){
-      status.textContent = "Автоотправка не сработала — отправьте заявку вручную.";
+      status.textContent = "Автоотправка ещё не активна — отправьте заявку вручную.";
       showFallback(text);
     }).then(function(){
       submit.disabled = false;
