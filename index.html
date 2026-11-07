@@ -97,6 +97,7 @@
   .case h3{font-size:21px;margin:0 0 8px}
   .case p{margin:0 0 14px;color:var(--ink-soft);font-size:15px}
   .case a{font-size:14px;text-decoration:none;border-bottom:1px solid var(--brass)}
+  .case:last-child:nth-child(odd){grid-column:1 / -1}
 
   /* calculator */
   .calc{background:#faf8f3;border:1px solid var(--line);padding:clamp(20px,3vw,34px);margin-top:26px}
@@ -206,8 +207,8 @@
   <div class="wrap">
     <div class="stats">
       <div class="stat"><b>142</b><span>обновления приложения «Деревенский шансон» в RuStore</span></div>
-      <div class="stat"><b>58 000</b><span>подписчиков на канале «Митрофановна» в Дзене</span></div>
-      <div class="stat"><b>4</b><span>площадки получают один и тот же материал</span></div>
+      <div class="stat"><b>113 900</b><span>подписчиков на каналах «Митрофановна» в Дзене и на YouTube</span></div>
+      <div class="stat"><b>5</b><span>площадок получают один и тот же материал</span></div>
       <div class="stat"><b>1 день</b><span>на ответ и смету по вашей задаче</span></div>
     </div>
   </div>
@@ -246,10 +247,10 @@
       <div class="svc">
         <div>
           <h3>Ведение каналов и групп</h3>
-          <p>Контент-план, тексты, картинки, публикация по слотам, ответы на комментарии, месячный отчёт. Ведём VK, Дзен, ОК и Rutube — один материал расходится по четырём площадкам.</p>
+          <p>Контент-план, тексты, картинки, публикация по слотам, ответы на комментарии, месячный отчёт. Ведём VK, Дзен, ОК, Rutube и YouTube — один материал расходится по пяти площадкам.</p>
           <ul><li>контент-план</li><li>посты и обложки</li><li>расписание</li><li>комментарии</li><li>отчёт</li></ul>
         </div>
-        <div class="price">10–25 тыс. ₽ / мес<small>за площадку. Связка из четырёх — 30–60 тыс. ₽ / мес</small></div>
+        <div class="price">10–25 тыс. ₽ / мес<small>за площадку. Связка из пяти — 35–65 тыс. ₽ / мес</small></div>
       </div>
 
       <div class="svc">
@@ -335,9 +336,15 @@
           <a href="https://vk.com/mitrofanovna" rel="noopener">Открыть сообщество →</a>
         </article>
         <article class="case">
+          <div class="tag">YouTube · видео</div>
+          <h3>«Ансамбль Митрофановна»</h3>
+          <p>55 900 подписчиков и 11,4 млн просмотров. Ролики, обложки, описания со ссылками и ответы на комментарии — через API, без ручной рутины.</p>
+          <a href="https://www.youtube.com/channel/UC5N2sJLJ-2ojF5_Rwpr3WNw" rel="noopener">Открыть канал →</a>
+        </article>
+        <article class="case">
           <div class="tag">Автоматизация</div>
           <h3>Конвейер публикаций</h3>
-          <p>Один материал выходит на четырёх площадках по расписанию. Проверка факта публикации и защита от дублей — без ручного контроля.</p>
+          <p>Один материал выходит на пяти площадках по расписанию. Проверка факта публикации и защита от дублей — без ручного контроля.</p>
           <a href="#calc">Оценить свою задачу →</a>
         </article>
       </div>
@@ -423,6 +430,8 @@
       <dl>
         <dt>Сообщество</dt>
         <dd><a href="https://vk.com/mitrofanovna" rel="noopener">vk.com/mitrofanovna</a></dd>
+        <dt>YouTube</dt>
+        <dd><a href="https://www.youtube.com/channel/UC5N2sJLJ-2ojF5_Rwpr3WNw" rel="noopener">«Ансамбль Митрофановна»</a></dd>
         <dt>Приложение в RuStore</dt>
         <dd><a href="https://www.rustore.ru/catalog/app/com.example.dsradio" rel="noopener">Радио «Деревенский шансон»</a></dd>
         <dt>Где работаем</dt>
@@ -451,7 +460,8 @@
         {label:"Одна площадка", price:"10–25 тыс. ₽ / мес", term:"старт через 3–5 дней", hint:"Контент-план, тексты, картинки, публикации и ответы на комментарии для одной площадки."},
         {label:"Две площадки", price:"20–45 тыс. ₽ / мес", term:"старт через 3–5 дней", hint:"Один материал адаптируется под две площадки, отчёт общий."},
         {label:"Три площадки", price:"28–55 тыс. ₽ / мес", term:"старт через 3–5 дней", hint:"Один материал — три площадки. Дешевле, чем три отдельных подрядчика."},
-        {label:"Четыре площадки (связка)", price:"30–60 тыс. ₽ / мес", term:"старт через 5–7 дней", hint:"VK, Дзен, ОК и Rutube из одного контент-плана. Максимальный охват за те же деньги."}
+        {label:"Четыре площадки (связка)", price:"30–60 тыс. ₽ / мес", term:"старт через 5–7 дней", hint:"VK, Дзен, ОК и Rutube из одного контент-плана. Максимальный охват за те же деньги."},
+        {label:"Пять площадок (связка)", price:"35–65 тыс. ₽ / мес", term:"старт через 5–7 дней", hint:"VK, Дзен, ОК, Rutube и YouTube из одного контент-плана. Плюс видео и клипы для YouTube."}
       ]
     },
     auto: {
