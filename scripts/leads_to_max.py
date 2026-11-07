@@ -77,6 +77,49 @@ def body_text(msg) -> str:
     return payload.decode(charset, errors="replace")
 
 
+def body_html_raw(msg) -> str:
+    """Сырой HTML письма (FormSubmit шлёт таблицу заявки в HTML)."""
+    if msg.is_multipart():
+        for part in msg.walk():
+            if part.get_content_type() == "text/html":
+                payload = part.get_payload(decode=True) or b""
+                charset = part.get_content_charset() or "utf-8"
+                return payload.decode(charset, errors="replace")
+    return ""
+
+
+LEAD_LABELS = {
+    "name": "Имя",
+    "contact": "Контакт",
+    "task": "Задача",
+    "budget": "Бюджет",
+    "comment": "Комментарий",
+    "estimate": "Смета",
+}
+
+
+def clean_lead(subject: str, html: str) -> str:
+    """Из HTML-письма FormSubmit делает краткий текст: заголовок + пары «Поле: значение»."""
+    subject = subject.strip() or "Заявка с сайта"
+    if not html:
+        return subject
+    rows = []
+    for tr in re.findall(r"<tr[^>]*>(.*?)</tr>", html, flags=re.S | re.I):
+        key_m = re.search(r"<strong[^>]*>(.*?)</strong>", tr, flags=re.S | re.I)
+        val_m = re.search(r"<pre[^>]*>(.*?)</pre>", tr, flags=re.S | re.I)
+        key = re.sub(r"<[^>]+>", "", key_m.group(1)).strip() if key_m else ""
+        val = re.sub(r"<[^>]+>", "", val_m.group(1)).strip() if val_m else ""
+        if key and val:
+            rows.append((key.strip(), val.strip()))
+    if not rows:
+        return subject
+    lines = [subject, ""]
+    for key, val in rows:
+        label = LEAD_LABELS.get(key.lower(), key)
+        lines.append(f"{label}: {val}")
+    return "\n".join(lines)
+
+
 def send_to_max(text: str) -> bool:
     base = env("MAX_API_BASE", "https://platform-api2.max.ru").rstrip("/") or "https://platform-api2.max.ru"
     token = env("MAX_TOKEN")
@@ -175,7 +218,7 @@ def main() -> int:
             if marker.lower() not in (subject + " " + text).lower():
                 continue
 
-            payload = text.strip()
+            payload = clean_lead(subject, body_html_raw(msg))
             if len(payload) > 3500:
                 payload = payload[:3500] + "\n…сообщение обрезано"
 
