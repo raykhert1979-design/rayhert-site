@@ -78,7 +78,7 @@ def body_text(msg) -> str:
 
 
 def send_to_max(text: str) -> bool:
-    base = env("MAX_API_BASE", "https://platform-api2.max.ru").rstrip("/")
+    base = env("MAX_API_BASE", "https://platform-api2.max.ru").rstrip("/") or "https://platform-api2.max.ru"
     token = env("MAX_TOKEN")
     chat_id = env("MAX_CHAT_ID")
 
