@@ -1,0 +1,55 @@
+name: Доставка заявок в MAX
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: leads-to-max
+  cancel-in-progress: false
+
+jobs:
+  deliver:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Забрать репозиторий
+        uses: actions/checkout@v4
+
+      - name: Подготовить Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Проверить секреты
+        env:
+          YANDEX_LOGIN: ${{ secrets.YANDEX_LOGIN }}
+          YANDEX_APP_PASSWORD: ${{ secrets.YANDEX_APP_PASSWORD }}
+          MAX_TOKEN: ${{ secrets.MAX_TOKEN }}
+          MAX_CHAT_ID: ${{ secrets.MAX_CHAT_ID }}
+        run: |
+          missing=""
+          [ -z "$YANDEX_LOGIN" ] && missing="$missing YANDEX_LOGIN"
+          [ -z "$YANDEX_APP_PASSWORD" ] && missing="$missing YANDEX_APP_PASSWORD"
+          [ -z "$MAX_TOKEN" ] && missing="$missing MAX_TOKEN"
+          [ -z "$MAX_CHAT_ID" ] && missing="$missing MAX_CHAT_ID"
+          if [ -n "$missing" ]; then
+            echo "::notice::Не заданы секреты:$missing — доставка заявок отключена"
+          else
+            echo "Все секреты на месте"
+          fi
+
+      - name: Доставить заявки из почты в MAX
+        env:
+          YANDEX_LOGIN: ${{ secrets.YANDEX_LOGIN }}
+          YANDEX_APP_PASSWORD: ${{ secrets.YANDEX_APP_PASSWORD }}
+          MAX_TOKEN: ${{ secrets.MAX_TOKEN }}
+          MAX_CHAT_ID: ${{ secrets.MAX_CHAT_ID }}
+          MAX_API_BASE: ${{ vars.MAX_API_BASE }}
+          MAIL_MARKER: "Заявка с сайта"
+        run: python scripts/leads_to_max.py
