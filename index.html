@@ -151,7 +151,13 @@
   footer{padding:26px 0;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
   footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 
+  /* audience */
+  .aud{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:26px}
+  .aud-item{background:var(--paper);padding:24px 26px}
+  .aud-item h3{font-size:20px;margin:0 0 8px}
+  .aud-item p{margin:0;color:var(--ink-soft);font-size:15.5px}
   @media(max-width:820px){
+    .aud{grid-template-columns:1fr}
     .stats{grid-template-columns:1fr 1fr}
     .svc{grid-template-columns:1fr;gap:12px}
     .price{text-align:left}
@@ -175,6 +181,7 @@
       <span><b>M-Track</b><span>студия каналов и продуктов</span></span>
     </a>
     <nav aria-label="Разделы страницы">
+      <a href="#who">Кому помогаем</a>
       <a href="#services">Услуги</a>
       <a href="#cases">Работы</a>
       <a href="#calc">Смета</a>
@@ -187,27 +194,53 @@
 <main id="top">
 
   <div class="wrap hero">
-    <p class="kicker">Ведение каналов · автоматизация · документы · Android</p>
-    <h1>Делаем то, что работает без нас</h1>
-    <p class="lead">Ведём соцсети, собираем конвейер публикаций и отчётов, готовим документы и презентации, выпускаем Android-приложения в RuStore. Один договор, один срок, одна ответственность за результат.</p>
+    <p class="kicker">Студия M-Track · удалённо по всей России</p>
+    <h1>Ведём каналы и выпускаем приложения — рутину берём на себя</h1>
+    <p class="lead">Для экспертов, локального бизнеса и магазинов: контент по расписанию, конвейер публикаций, документы и отчёты, Android-приложения в RuStore. Один договор, один срок, одна ответственность за результат.</p>
     <div class="actions">
-      <a class="btn" href="#calc">Собрать смету</a>
-      <a class="btn ghost" href="#services">Что мы делаем</a>
+      <a class="btn" href="#calc">Собрать смету за минуту</a>
+      <a class="btn ghost" href="#cases">Посмотреть работы</a>
     </div>
   </div>
 
   <div class="wrap">
     <div class="stats">
-      <div class="stat"><b>142</b><span>обновления приложения в RuStore</span></div>
-      <div class="stat"><b>58 000</b><span>подписчиков на канале Дзен</span></div>
-      <div class="stat"><b>14</b><span>Android-проектов в работе</span></div>
-      <div class="stat"><b>4</b><span>площадки из одного материала</span></div>
+      <div class="stat"><b>142</b><span>обновления приложения «Деревенский шансон» в RuStore</span></div>
+      <div class="stat"><b>58 000</b><span>подписчиков на канале «Митрофановна» в Дзене</span></div>
+      <div class="stat"><b>4</b><span>площадки получают один и тот же материал</span></div>
+      <div class="stat"><b>1 день</b><span>на ответ и смету по вашей задаче</span></div>
     </div>
   </div>
 
+  <section id="who">
+    <div class="wrap">
+      <div class="sec-head"><span class="num">01</span><h2>Кому помогаем</h2></div>
+      <p class="sec-note">Если узнали себя — напишите, обсудим задачу. Если не узнали — тоже напишите: скажем честно, наша это работа или нет.</p>
+
+      <div class="aud">
+        <div class="aud-item">
+          <h3>Экспертам и блогерам</h3>
+          <p>Знания и аудитория есть, а времени на публикации и монтаж нет. Ведём канал, делаем клипы и отвечаем подписчикам.</p>
+        </div>
+        <div class="aud-item">
+          <h3>Локальному бизнесу</h3>
+          <p>Кофейня, сервис, магазин у дома. Нужен ровный поток постов и приложение, в которое возвращаются клиенты.</p>
+        </div>
+        <div class="aud-item">
+          <h3>Онлайн-школам и курсам</h3>
+          <p>Программа, вебинары, документы. Собираем презентации, регламенты и рассылку материалов по площадкам.</p>
+        </div>
+        <div class="aud-item">
+          <h3>Тем, кто устал от подрядчиков</h3>
+          <p>Несколько исполнителей не сходятся в сроках. Берём проект целиком: один договор, один срок, один отчёт.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section id="services">
     <div class="wrap">
-      <div class="sec-head"><span class="num">01</span><h2>Услуги и цены</h2></div>
+      <div class="sec-head"><span class="num">02</span><h2>Услуги и цены</h2></div>
       <p class="sec-note">Цены — ориентиры для типовых задач. Точная сумма фиксируется в смете после короткого разговора о задаче: объём важнее прайса.</p>
 
       <div class="svc">
@@ -256,10 +289,32 @@
       </div>
     </div>
   </section>
-
+  <section id="how">
+    <div class="wrap">
+      <div class="sec-head"><span class="num">03</span><h2>Как проходит работа</h2></div>
+      <ol class="steps">
+        <li>
+          <h3>Задача и смета</h3>
+          <p>Вы описываете, что нужно. Мы задаём несколько вопросов и присылаем смету с составом работ, сроком и ценой. Бесплатно.</p>
+        </li>
+        <li>
+          <h3>Договор и предоплата</h3>
+          <p>Фиксируем объём и срок. Предоплата 50% для новых задач, остальное — после сдачи. Работаем как самозанятые, закрывающие документы предоставляем.</p>
+        </li>
+        <li>
+          <h3>Работа и показ</h3>
+          <p>Показываем промежуточный результат, а не финал вслепую. Два круга правок входят в цену, дальше — по новому согласованию.</p>
+        </li>
+        <li>
+          <h3>Сдача и поддержка</h3>
+          <p>Передаём файлы, доступы и инструкции. Если нужна поддержка — отдельным договором, без обязательного пакета.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
   <section id="cases">
     <div class="wrap">
-      <div class="sec-head"><span class="num">02</span><h2>Наши работы</h2></div>
+      <div class="sec-head"><span class="num">04</span><h2>Наши работы</h2></div>
       <p class="sec-note">Это не выдуманные кейсы для портфолио, а проекты, которые работают прямо сейчас. Их можно открыть и проверить.</p>
       <div class="cases">
         <article class="case">
@@ -288,10 +343,9 @@
       </div>
     </div>
   </section>
-
   <section id="calc">
     <div class="wrap">
-      <div class="sec-head"><span class="num">03</span><h2>Смета за минуту</h2></div>
+      <div class="sec-head"><span class="num">05</span><h2>Смета за минуту</h2></div>
       <p class="sec-note">Выберите задачу и объём — увидите вилку и срок. Это ориентир, а не счёт: точную сумму назовём после короткого разговора.</p>
 
       <form class="calc" id="calc-form" novalidate>
@@ -326,34 +380,9 @@
       </form>
     </div>
   </section>
-
-  <section id="how">
-    <div class="wrap">
-      <div class="sec-head"><span class="num">04</span><h2>Как проходит работа</h2></div>
-      <ol class="steps">
-        <li>
-          <h3>Задача и смета</h3>
-          <p>Вы описываете, что нужно. Мы задаём несколько вопросов и присылаем смету с составом работ, сроком и ценой. Бесплатно.</p>
-        </li>
-        <li>
-          <h3>Договор и предоплата</h3>
-          <p>Фиксируем объём и срок. Предоплата 50% для новых задач, остальное — после сдачи. Работаем как самозанятые, закрывающие документы предоставляем.</p>
-        </li>
-        <li>
-          <h3>Работа и показ</h3>
-          <p>Показываем промежуточный результат, а не финал вслепую. Два круга правок входят в цену, дальше — по новому согласованию.</p>
-        </li>
-        <li>
-          <h3>Сдача и поддержка</h3>
-          <p>Передаём файлы, доступы и инструкции. Если нужна поддержка — отдельным договором, без обязательного пакета.</p>
-        </li>
-      </ol>
-    </div>
-  </section>
-
   <section id="faq">
     <div class="wrap">
-      <div class="sec-head"><span class="num">05</span><h2>Частые вопросы</h2></div>
+      <div class="sec-head"><span class="num">06</span><h2>Частые вопросы</h2></div>
 
       <details>
         <summary>Сколько времени занимает задача?</summary>
@@ -381,7 +410,6 @@
       </details>
     </div>
   </section>
-
   <section class="contact" id="contact">
     <div class="wrap contact-grid">
       <div>
