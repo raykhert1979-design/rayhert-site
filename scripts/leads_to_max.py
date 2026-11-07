@@ -18,6 +18,7 @@
   MAIL_MARKER           — необязательно, подстрока темы/текста письма
 """
 
+import datetime
 import email
 import imaplib
 import json
@@ -32,6 +33,8 @@ from email.header import decode_header
 
 MAIL_MARKER_DEFAULT = "Заявка с сайта"
 IMAP_HOST = "imap.yandex.ru"
+IMAP_LOOKBACK_DAYS = 3
+MAX_PER_RUN = 100
 ARCHIVE_FOLDER = "Заявки"
 
 
@@ -134,16 +137,34 @@ def main() -> int:
         box.login(login, password)
         box.select("INBOX")
 
-        typ, data = box.search(None, "UNSEEN")
+        since = (datetime.date.today() - datetime.timedelta(days=IMAP_LOOKBACK_DAYS)).strftime("%d-%b-%Y")
+        typ, data = box.search(None, f'(UNSEEN SENTSINCE {since})')
         if typ != "OK":
             print("IMAP: поиск писем не удался")
             return 1
 
         ids = data[0].split()
-        print(f"Непрочитанных писем: {len(ids)}")
+        if len(ids) > MAX_PER_RUN:
+            ids = ids[-MAX_PER_RUN:]
+        print(f"Непрочитанных писем (за {IMAP_LOOKBACK_DAYS} дн.): {len(ids)}")
 
         for num in ids:
-            typ, raw = box.fetch(num, "(RFC822)")
+            try:
+                typ, raw = box.fetch(num, "(BODY.PEEK[])")
+            except Exception as exc:
+                print(f"IMAP: соединение оборвалось при загрузке {num} — переподключаюсь ({exc})")
+                try:
+                    box.logout()
+                except Exception:
+                    pass
+                try:
+                    box = imaplib.IMAP4_SSL(IMAP_HOST)
+                    box.login(login, password)
+                    box.select("INBOX")
+                    typ, raw = box.fetch(num, "(BODY.PEEK[])")
+                except Exception as exc2:
+                    print(f"IMAP: повторное подключение не удалось — {exc2}")
+                    break
             if typ != "OK" or not raw or not isinstance(raw[0], tuple):
                 continue
 
@@ -158,9 +179,17 @@ def main() -> int:
             if len(payload) > 3500:
                 payload = payload[:3500] + "\n…сообщение обрезано"
 
-            if send_to_max(payload):
+            try:
+                ok = send_to_max(payload)
+            except Exception as exc:
+                print(f"MAX: исключение — {exc}")
+                ok = False
+            if ok:
                 sent += 1
-                box.store(num, "+FLAGS", "\\Seen")
+                try:
+                    box.store(num, "+FLAGS", "\\Seen")
+                except Exception:
+                    pass
                 try:
                     box.copy(num, ARCHIVE_FOLDER)
                 except Exception:
