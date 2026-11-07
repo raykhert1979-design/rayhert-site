@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>M-Track — каналы, автоматизация, документы и Android-приложения</title>
+<meta name="description" content="Студия M-Track: ведём каналы и группы, собираем автоматизацию публикаций и отчётов, делаем документы, презентации и Android-приложения для RuStore. Один договор, один срок, одна ответственность.">
+<meta property="og:title" content="M-Track — студия каналов, автоматизации и Android-приложений">
+<meta property="og:description" content="Ведение каналов, автоматизация публикаций, документы и аналитика, Android-приложения в RuStore. 142 релиза, 58 000 подписчиков.">
+<meta property="og:type" content="website">
+<style>
+  :root{
+    --ink:#14181b;
+    --ink-soft:#2b3236;
+    --paper:#f3f1ec;
+    --paper-deep:#e8e4da;
+    --accent:#1f6f5c;
+    --accent-soft:#d8e6e0;
+    --brass:#c98a2e;
+    --muted:#656a67;
+    --line:#cfcabd;
+    --radius:2px;
+    --step:clamp(28px,5vw,64px);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    *{animation:none!important;transition:none!important}
+  }
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font:400 17px/1.6 "Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.display{font-family:Georgia,"Times New Roman",serif;font-weight:400;letter-spacing:-.01em}
+  a{color:var(--accent)}
+  a:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible{
+    outline:2px solid var(--brass);outline-offset:3px;border-radius:var(--radius)
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:0 clamp(18px,4vw,40px)}
+  .rule{border:0;border-top:1px solid var(--line);margin:0}
+
+  /* header */
+  header{padding:22px 0;border-bottom:1px solid var(--line)}
+  .bar{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink)}
+  .brand svg{display:block}
+  .brand b{font-family:Georgia,serif;font-size:21px;font-weight:400;letter-spacing:.02em}
+  .brand span{display:block;font-size:12px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+  nav{display:flex;gap:26px;flex-wrap:wrap}
+  nav a{color:var(--ink-soft);text-decoration:none;font-size:15px;border-bottom:1px solid transparent;padding-bottom:2px}
+  nav a:hover{border-color:var(--brass)}
+
+  /* hero */
+  .hero{padding-top:var(--step);padding-bottom:calc(var(--step) * .7)}
+  .kicker{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 18px}
+  h1{font-size:clamp(34px,5.6vw,62px);line-height:1.06;margin:0 0 22px;max-width:16ch}
+  .lead{font-size:clamp(17px,2vw,20px);color:var(--ink-soft);max-width:56ch;margin:0 0 30px}
+  .actions{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+  .btn{
+    display:inline-block;padding:14px 26px;border:1px solid var(--ink);background:var(--ink);color:var(--paper);
+    text-decoration:none;font-size:15px;letter-spacing:.02em;border-radius:var(--radius);cursor:pointer;
+    transition:background .15s ease,color .15s ease
+  }
+  .btn:hover{background:var(--accent);border-color:var(--accent)}
+  .btn.ghost{background:transparent;color:var(--ink)}
+  .btn.ghost:hover{background:var(--paper-deep);color:var(--ink)}
+
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);
+    border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-top:calc(var(--step) * .8)}
+  .stat{background:var(--paper);padding:22px 20px}
+  .stat b{display:block;font-family:Georgia,serif;font-size:clamp(24px,3vw,34px);line-height:1.1;color:var(--ink)}
+  .stat span{display:block;margin-top:6px;font-size:13px;color:var(--muted);line-height:1.4}
+
+  /* sections */
+  section{padding:calc(var(--step) * .9) 0}
+  .sec-head{display:flex;align-items:baseline;gap:18px;border-bottom:1px solid var(--ink);padding-bottom:12px;margin-bottom:8px}
+  .sec-head .num{font-family:Georgia,serif;color:var(--brass);font-size:15px;letter-spacing:.08em}
+  h2{font-size:clamp(26px,3.6vw,38px);margin:0;line-height:1.15}
+  .sec-note{color:var(--muted);max-width:62ch;margin:18px 0 0}
+
+  /* service rows */
+  .svc{border-bottom:1px solid var(--line);padding:26px 0;display:grid;grid-template-columns:1.55fr 1fr;gap:28px}
+  .svc:last-child{border-bottom:0}
+  .svc h3{font-size:23px;margin:0 0 8px}
+  .svc p{margin:0;color:var(--ink-soft);font-size:16px}
+  .svc ul{margin:12px 0 0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:8px}
+  .svc li{font-size:13px;color:var(--ink-soft);border:1px solid var(--line);padding:4px 10px;border-radius:var(--radius);background:#faf8f3}
+  .price{font-family:Georgia,serif;font-size:21px;line-height:1.35;color:var(--ink);text-align:right}
+  .price small{display:block;font-family:"Segoe UI",sans-serif;font-size:13px;color:var(--muted);margin-top:6px;line-height:1.45}
+
+  /* cases */
+  .cases{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:26px}
+  .case{background:var(--paper);padding:26px}
+  .case .tag{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--brass);margin-bottom:10px}
+  .case h3{font-size:21px;margin:0 0 8px}
+  .case p{margin:0 0 14px;color:var(--ink-soft);font-size:15px}
+  .case a{font-size:14px;text-decoration:none;border-bottom:1px solid var(--brass)}
+
+  /* calculator */
+  .calc{background:#faf8f3;border:1px solid var(--line);padding:clamp(20px,3vw,34px);margin-top:26px}
+  .calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px 26px}
+  .field{display:flex;flex-direction:column;gap:7px}
+  .field label{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  select{
+    appearance:none;background:#fff url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%2314181b' stroke-width='1.6'/%3E%3C/svg%3E") no-repeat right 14px center;
+    border:1px solid var(--line);border-radius:var(--radius);padding:13px 40px 13px 14px;
+    font:inherit;font-size:16px;color:var(--ink);width:100%;cursor:pointer
+  }
+  .out{margin-top:24px;border-top:1px solid var(--line);padding-top:22px;display:grid;grid-template-columns:1.2fr .8fr;gap:22px;align-items:end}
+  .out .total{font-family:Georgia,serif;font-size:clamp(26px,3.4vw,36px);line-height:1.15}
+  .out .term{font-size:15px;color:var(--ink-soft);margin-top:6px}
+  .out .hint{font-size:13px;color:var(--muted);margin-top:10px;max-width:44ch}
+  .out .go{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+  .copy-note{font-size:13px;color:var(--accent);min-height:18px}
+
+  /* steps */
+  .steps{margin:26px 0 0;padding:0;list-style:none;counter-reset:s}
+  .steps li{position:relative;padding:0 0 24px 58px;border-left:1px solid var(--line);margin-left:14px}
+  .steps li:last-child{border-left-color:transparent;padding-bottom:0}
+  .steps li::before{
+    counter-increment:s;content:counter(s);position:absolute;left:-15px;top:-2px;width:30px;height:30px;
+    display:grid;place-items:center;background:var(--paper);border:1px solid var(--ink);border-radius:50%;
+    font-family:Georgia,serif;font-size:14px
+  }
+  .steps h3{font-size:19px;margin:0 0 6px}
+  .steps p{margin:0;color:var(--ink-soft);font-size:15.5px}
+
+  /* faq */
+  details{border-bottom:1px solid var(--line);padding:18px 0}
+  details summary{cursor:pointer;font-size:18px;font-family:Georgia,serif;list-style:none;display:flex;justify-content:space-between;gap:16px}
+  details summary::-webkit-details-marker{display:none}
+  details summary::after{content:"+";color:var(--brass);font-size:24px;line-height:1}
+  details[open] summary::after{content:"−"}
+  details p{margin:12px 0 0;color:var(--ink-soft);max-width:70ch;font-size:15.5px}
+
+  /* contact */
+  .contact{background:var(--ink);color:var(--paper);padding:calc(var(--step) * .9) 0}
+  .contact h2{color:var(--paper)}
+  .contact .lead{color:#c9c6bd}
+  .contact .btn{background:var(--paper);color:var(--ink);border-color:var(--paper)}
+  .contact .btn:hover{background:var(--brass);border-color:var(--brass);color:var(--ink)}
+  .contact .btn.ghost{background:transparent;color:var(--paper);border-color:#5a605e}
+  .contact .btn.ghost:hover{background:#22282b;color:var(--paper)}
+  .contact-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:36px;align-items:start}
+  .contact dl{margin:0;font-size:15px}
+  .contact dt{color:#9a9a92;font-size:12px;letter-spacing:.1em;text-transform:uppercase;margin-top:16px}
+  .contact dd{margin:4px 0 0}
+  .contact a{color:#e7d3a8;text-decoration:none;border-bottom:1px solid #6b5a34}
+  footer{padding:26px 0;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+  footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+  @media(max-width:820px){
+    .stats{grid-template-columns:1fr 1fr}
+    .svc{grid-template-columns:1fr;gap:12px}
+    .price{text-align:left}
+    .cases{grid-template-columns:1fr}
+    .calc-grid{grid-template-columns:1fr}
+    .out{grid-template-columns:1fr}
+    .contact-grid{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="#top" aria-label="M-Track — на главную">
+      <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true">
+        <rect x="1" y="1" width="32" height="32" fill="none" stroke="#14181b"/>
+        <path d="M7 24V10l6 8 6-8v14" fill="none" stroke="#1f6f5c" stroke-width="2"/>
+        <path d="M22 10h5v14" fill="none" stroke="#c98a2e" stroke-width="2"/>
+      </svg>
+      <span><b>M-Track</b><span>студия каналов и продуктов</span></span>
+    </a>
+    <nav aria-label="Разделы страницы">
+      <a href="#services">Услуги</a>
+      <a href="#cases">Работы</a>
+      <a href="#calc">Смета</a>
+      <a href="#how">Как работаем</a>
+      <a href="#contact">Контакты</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+  <div class="wrap hero">
+    <p class="kicker">Ведение каналов · автоматизация · документы · Android</p>
+    <h1>Делаем то, что работает без нас</h1>
+    <p class="lead">Ведём соцсети, собираем конвейер публикаций и отчётов, готовим документы и презентации, выпускаем Android-приложения в RuStore. Один договор, один срок, одна ответственность за результат.</p>
+    <div class="actions">
+      <a class="btn" href="#calc">Собрать смету</a>
+      <a class="btn ghost" href="#services">Что мы делаем</a>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="stats">
+      <div class="stat"><b>142</b><span>обновления приложения в RuStore</span></div>
+      <div class="stat"><b>58 000</b><span>подписчиков на канале Дзен</span></div>
+      <div class="stat"><b>14</b><span>Android-проектов в работе</span></div>
+      <div class="stat"><b>4</b><span>площадки из одного материала</span></div>
+    </div>
+  </div>
+
+  <section id="services">
+    <div class="wrap">
+      <div class="sec-head"><span class="num">01</span><h2>Услуги и цены</h2></div>
+      <p class="sec-note">Цены — ориентиры для типовых задач. Точная сумма фиксируется в смете после короткого разговора о задаче: объём важнее прайса.</p>
+
+      <div class="svc">
+        <div>
+          <h3>Ведение каналов и групп</h3>
+          <p>Контент-план, тексты, картинки, публикация по слотам, ответы на комментарии, месячный отчёт. Ведём VK, Дзен, ОК и Rutube — один материал расходится по четырём площадкам.</p>
+          <ul><li>контент-план</li><li>посты и обложки</li><li>расписание</li><li>комментарии</li><li>отчёт</li></ul>
+        </div>
+        <div class="price">10–25 тыс. ₽ / мес<small>за площадку. Связка из четырёх — 30–60 тыс. ₽ / мес</small></div>
+      </div>
+
+      <div class="svc">
+        <div>
+          <h3>Автоматизация</h3>
+          <p>Убираем ручную рутину: публикации по расписанию с проверкой, что материал действительно вышел, сбор неотвеченных комментариев, регулярные отчёты, разбор и сверка выгрузок.</p>
+          <ul><li>конвейер публикаций</li><li>автоответы</li><li>сверка выгрузок</li><li>отчёты по расписанию</li></ul>
+        </div>
+        <div class="price">от 10 тыс. ₽<small>за сценарий. Внедрение конвейера публикаций — 15–40 тыс. ₽, поддержка 5–12 тыс. ₽ / мес</small></div>
+      </div>
+
+      <div class="svc">
+        <div>
+          <h3>Документы, презентации, аналитика</h3>
+          <p>Презентации для КП и защиты проекта, дашборды и сводные таблицы, регламенты и инструкции, отчёты в PDF, разбор бухгалтерских выгрузок с проверкой сходимости итогов.</p>
+          <ul><li>PPTX</li><li>Excel</li><li>Word</li><li>PDF</li><li>разбор 1С</li></ul>
+        </div>
+        <div class="price">2–15 тыс. ₽<small>за документ. Разбор выгрузок и дашборды — 5–20 тыс. ₽, ресёрч рынка — 8–30 тыс. ₽</small></div>
+      </div>
+
+      <div class="svc">
+        <div>
+          <h3>Android-приложения</h3>
+          <p>Приложения под Android и публикация в RuStore: сборка, подпись, карточка, скриншоты, обновления и ответы на отзывы. Доводим до магазина, а не до «работает у меня на компьютере».</p>
+          <ul><li>RuStore</li><li>сборка и подпись</li><li>карточка</li><li>обновления</li><li>отзывы</li></ul>
+        </div>
+        <div class="price">80–400 тыс. ₽<small>простое приложение — от 80 тыс. ₽, MVP — 150–400 тыс. ₽, обновление — 10–40 тыс. ₽</small></div>
+      </div>
+
+      <div class="svc">
+        <div>
+          <h3>Видео и графика</h3>
+          <p>Нарезка роликов, короткие клипы, тизеры, брендирование логотипом, обложки и иллюстрации по теме материала.</p>
+          <ul><li>клипы 30–60 с</li><li>тизеры</li><li>логотип на видео</li><li>обложки</li></ul>
+        </div>
+        <div class="price">0,5–5 тыс. ₽<small>за ролик или обложку. Пакет из десяти — со скидкой</small></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="cases">
+    <div class="wrap">
+      <div class="sec-head"><span class="num">02</span><h2>Наши работы</h2></div>
+      <p class="sec-note">Это не выдуманные кейсы для портфолио, а проекты, которые работают прямо сейчас. Их можно открыть и проверить.</p>
+      <div class="cases">
+        <article class="case">
+          <div class="tag">Android · RuStore</div>
+          <h3>Радио «Деревенский шансон»</h3>
+          <p>Приложение в RuStore: 142 обновления, живая аудитория, встроенная оценка приложения, отзывы и регулярные релизы.</p>
+          <a href="https://www.rustore.ru/catalog/app/com.example.dsradio" rel="noopener">Открыть в RuStore →</a>
+        </article>
+        <article class="case">
+          <div class="tag">Дзен · контент</div>
+          <h3>Канал «Митрофановна»</h3>
+          <p>58 000 подписчиков, ежедневные публикации, рубрики от завтрака до истории дня, иллюстрации и видео.</p>
+        </article>
+        <article class="case">
+          <div class="tag">VK · сообщество</div>
+          <h3>«В гостях у Митрофановны»</h3>
+          <p>Ведение сообщества: посты с иллюстрациями, ответы на комментарии, перелив аудитории между площадками.</p>
+          <a href="https://vk.com/mitrofanovna" rel="noopener">Открыть сообщество →</a>
+        </article>
+        <article class="case">
+          <div class="tag">Автоматизация</div>
+          <h3>Конвейер публикаций</h3>
+          <p>Один материал выходит на четырёх площадках по расписанию. Проверка факта публикации и защита от дублей — без ручного контроля.</p>
+          <a href="#calc">Оценить свою задачу →</a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="calc">
+    <div class="wrap">
+      <div class="sec-head"><span class="num">03</span><h2>Смета за минуту</h2></div>
+      <p class="sec-note">Выберите задачу и объём — увидите вилку и срок. Это ориентир, а не счёт: точную сумму назовём после короткого разговора.</p>
+
+      <form class="calc" id="calc-form" novalidate>
+        <div class="calc-grid">
+          <div class="field">
+            <label for="service">Задача</label>
+            <select id="service" name="service">
+              <option value="smm">Ведение канала или группы</option>
+              <option value="auto">Автоматизация публикаций и отчётов</option>
+              <option value="docs">Документы, презентации, аналитика</option>
+              <option value="android">Android-приложение</option>
+              <option value="video">Видео и обложки</option>
+            </select>
+          </div>
+          <div class="field" id="scope-field">
+            <label for="scope">Объём</label>
+            <select id="scope" name="scope"></select>
+          </div>
+        </div>
+
+        <div class="out">
+          <div>
+            <div class="total" id="total" aria-live="polite">10–25 тыс. ₽ / мес</div>
+            <div class="term" id="term">старт через 3–5 дней</div>
+            <p class="hint" id="hint">Цена за одну площадку: контент-план, тексты, картинки, публикации и ответы на комментарии.</p>
+          </div>
+          <div class="go">
+            <button class="btn" type="button" id="copy-btn">Скопировать смету</button>
+            <span class="copy-note" id="copy-note" role="status" aria-live="polite"></span>
+          </div>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section id="how">
+    <div class="wrap">
+      <div class="sec-head"><span class="num">04</span><h2>Как проходит работа</h2></div>
+      <ol class="steps">
+        <li>
+          <h3>Задача и смета</h3>
+          <p>Вы описываете, что нужно. Мы задаём несколько вопросов и присылаем смету с составом работ, сроком и ценой. Бесплатно.</p>
+        </li>
+        <li>
+          <h3>Договор и предоплата</h3>
+          <p>Фиксируем объём и срок. Предоплата 50% для новых задач, остальное — после сдачи. Работаем как самозанятые, закрывающие документы предоставляем.</p>
+        </li>
+        <li>
+          <h3>Работа и показ</h3>
+          <p>Показываем промежуточный результат, а не финал вслепую. Два круга правок входят в цену, дальше — по новому согласованию.</p>
+        </li>
+        <li>
+          <h3>Сдача и поддержка</h3>
+          <p>Передаём файлы, доступы и инструкции. Если нужна поддержка — отдельным договором, без обязательного пакета.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="faq">
+    <div class="wrap">
+      <div class="sec-head"><span class="num">05</span><h2>Частые вопросы</h2></div>
+
+      <details>
+        <summary>Сколько времени занимает задача?</summary>
+        <p>Презентация или документ — 2–5 дней. Ведение канала начинается через 3–5 дней после согласования. Автоматизация — 1–3 недели. Android-приложение: простое — 2–4 недели, MVP — от полутора месяцев.</p>
+      </details>
+
+      <details>
+        <summary>Почему у приложений нет iOS?</summary>
+        <p>Честно: для сборки под iPhone нужен Mac и аккаунт разработчика Apple, у нас этого нет. Вместо обещаний предлагаем веб-версию — она открывается на iPhone в браузере и ставится на домашний экран.</p>
+      </details>
+
+      <details>
+        <summary>Что входит в правки?</summary>
+        <p>Два круга правок по согласованному составу работ. Изменение состава — это новая задача, её оцениваем отдельно. Так не бывает сюрпризов ни у вас, ни у нас.</p>
+      </details>
+
+      <details>
+        <summary>Можно ли начать с маленькой задачи?</summary>
+        <p>Да, и мы это советуем. Начните с одного документа, поста или аудита — посмотрите, как мы работаем, и решите про продолжение. Без больших предоплат на первом шаге.</p>
+      </details>
+
+      <details>
+        <summary>Кто отвечает за результат?</summary>
+        <p>Мы ведём проект целиком: один договор, один срок, одна ответственность. Вам не нужно собирать нескольких подрядчиков и сводить их между собой.</p>
+      </details>
+    </div>
+  </section>
+
+  <section class="contact" id="contact">
+    <div class="wrap contact-grid">
+      <div>
+        <h2>Обсудим задачу?</h2>
+        <p class="lead">Расскажите, что нужно сделать — ответим со сметой и сроком. Обычно это занимает один рабочий день.</p>
+        <div class="actions">
+          <a class="btn" href="https://vk.com/mitrofanovna" rel="noopener">Написать в VK</a>
+          <a class="btn ghost" href="#calc">Вернуться к смете</a>
+        </div>
+      </div>
+      <dl>
+        <dt>Сообщество</dt>
+        <dd><a href="https://vk.com/mitrofanovna" rel="noopener">vk.com/mitrofanovna</a></dd>
+        <dt>Приложение в RuStore</dt>
+        <dd><a href="https://www.rustore.ru/catalog/app/com.example.dsradio" rel="noopener">Радио «Деревенский шансон»</a></dd>
+        <dt>Где работаем</dt>
+        <dd>Удалённо, по всей России</dd>
+        <dt>Статус</dt>
+        <dd>Самозанятость, НПД. Договор и закрывающие документы — по запросу.</dd>
+      </dl>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 M-Track. Каналы, автоматизация, документы, Android.</span>
+    <span>Страница не собирает персональные данные: смета считается у вас в браузере.</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var DATA = {
+    smm: {
+      scopes: [
+        {label:"Одна площадка", price:"10–25 тыс. ₽ / мес", term:"старт через 3–5 дней", hint:"Контент-план, тексты, картинки, публикации и ответы на комментарии для одной площадки."},
+        {label:"Две площадки", price:"20–45 тыс. ₽ / мес", term:"старт через 3–5 дней", hint:"Один материал адаптируется под две площадки, отчёт общий."},
+        {label:"Три площадки", price:"28–55 тыс. ₽ / мес", term:"старт через 3–5 дней", hint:"Один материал — три площадки. Дешевле, чем три отдельных подрядчика."},
+        {label:"Четыре площадки (связка)", price:"30–60 тыс. ₽ / мес", term:"старт через 5–7 дней", hint:"VK, Дзен, ОК и Rutube из одного контент-плана. Максимальный охват за те же деньги."}
+      ]
+    },
+    auto: {
+      scopes: [
+        {label:"Один сценарий", price:"от 10 тыс. ₽", term:"3–7 дней", hint:"Например, регулярный отчёт или разбор выгрузки. Фиксированная цена после описания процесса."},
+        {label:"Конвейер публикаций", price:"15–40 тыс. ₽", term:"1–3 недели", hint:"Расписание, проверка факта публикации, защита от дублей. Поддержка — 5–12 тыс. ₽ / мес."},
+        {label:"Публикации + комментарии", price:"25–55 тыс. ₽", term:"2–4 недели", hint:"Публикации по расписанию и сбор неотвеченных комментариев в один список."},
+        {label:"Комплекс: контент и отчёты", price:"от 60 тыс. ₽", term:"3–5 недель", hint:"Конвейер публикаций плюс регулярная отчётность по каналам и приложению."}
+      ]
+    },
+    docs: {
+      scopes: [
+        {label:"Презентация", price:"3–10 тыс. ₽", term:"2–4 дня", hint:"PPTX: структура, тексты, графика. Редактируется в PowerPoint."},
+        {label:"Документ Word или PDF", price:"2–8 тыс. ₽", term:"2–4 дня", hint:"Регламент, инструкция, письмо, коммерческое предложение."},
+        {label:"Дашборд в Excel", price:"5–15 тыс. ₽", term:"3–7 дней", hint:"Сводные, формулы, графики, проверка сходимости итогов."},
+        {label:"Разбор выгрузки из 1С", price:"5–20 тыс. ₽", term:"3–7 дней", hint:"ОСВ и карточки счетов: сходимость Дт/Кт, арифметика сальдо, красное сальдо."},
+        {label:"Ресёрч рынка", price:"8–30 тыс. ₽", term:"5–14 дней", hint:"Конкуренты, цены, спрос — со ссылками на источники."}
+      ]
+    },
+    android: {
+      scopes: [
+        {label:"Обновление существующего", price:"10–40 тыс. ₽", term:"2–5 дней", hint:"Новая версия, сборка, подпись, публикация в RuStore."},
+        {label:"Простое приложение", price:"80–150 тыс. ₽", term:"2–4 недели", hint:"Несколько экранов, локальные данные, без сложной серверной части."},
+        {label:"MVP с сервером", price:"150–400 тыс. ₽", term:"от 1,5 месяцев", hint:"Регистрация, данные, интеграции. Этапы с приёмкой после каждого."},
+        {label:"Поддержка и отзывы", price:"20–50 тыс. ₽ / мес", term:"старт сразу", hint:"Обновления под новые версии Android, ответы на отзывы, мелкие доработки."}
+      ]
+    },
+    video: {
+      scopes: [
+        {label:"Обложка или иллюстрация", price:"0,5–1,5 тыс. ₽", term:"1–2 дня", hint:"Под конкретный пост или ролик, в единой стилистике канала."},
+        {label:"Короткий клип 30–60 с", price:"1,5–3 тыс. ₽", term:"1–2 дня", hint:"Нарезка, субтитры при необходимости, вертикальный формат."},
+        {label:"Тизер к ролику", price:"2–4 тыс. ₽", term:"1–2 дня", hint:"Короткая версия длинного видео для клипов и соцсетей."},
+        {label:"Пакет из 10 роликов", price:"10–25 тыс. ₽", term:"3–7 дней", hint:"Единая стилистика, скидка за объём."}
+      ]
+    }
+  };
+
+  var service = document.getElementById("service");
+  var scope = document.getElementById("scope");
+  var total = document.getElementById("total");
+  var term = document.getElementById("term");
+  var hint = document.getElementById("hint");
+  var note = document.getElementById("copy-note");
+  var copyBtn = document.getElementById("copy-btn");
+  var form = document.getElementById("calc-form");
+
+  function currentScope(){
+    var group = DATA[service.value];
+    return group.scopes[Number(scope.value) || 0];
+  }
+
+  function fillScopes(){
+    var group = DATA[service.value];
+    scope.innerHTML = "";
+    group.scopes.forEach(function(item, i){
+      var o = document.createElement("option");
+      o.value = String(i);
+      o.textContent = item.label;
+      scope.appendChild(o);
+    });
+    scope.selectedIndex = 0;
+    render();
+  }
+
+  function render(){
+    var item = currentScope();
+    total.textContent = item.price;
+    term.textContent = item.term;
+    hint.textContent = item.hint;
+    note.textContent = "";
+  }
+
+  function summary(){
+    var item = currentScope();
+    return "Задача: " + service.options[service.selectedIndex].text +
+           "\nОбъём: " + item.label +
+           "\nОриентир: " + item.price +
+           "\nСрок: " + item.term +
+           "\n\nЗаявка с сайта M-Track";
+  }
+
+  service.addEventListener("change", fillScopes);
+  scope.addEventListener("change", render);
+  form.addEventListener("submit", function(e){ e.preventDefault(); });
+
+  copyBtn.addEventListener("click", function(){
+    var text = summary();
+    function done(){ note.textContent = "Смета скопирована — вставьте её в сообщение."; }
+    function fallback(){
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly","");
+      ta.style.position = "fixed";
+      ta.style.top = "-1000px";
+      document.body.appendChild(ta);
+      ta.select();
+      var ok = false;
+      try { ok = document.execCommand("copy"); } catch (err) { ok = false; }
+      document.body.removeChild(ta);
+      note.textContent = ok ? "Смета скопирована — вставьте её в сообщение."
+                            : "Скопируйте вручную: " + text.replace(/\n/g, " · ");
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done, fallback);
+    } else {
+      fallback();
+    }
+  });
+
+  fillScopes();
+})();
+</script>
+</body>
+</html>
