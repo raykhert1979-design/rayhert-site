@@ -157,7 +157,28 @@
   .aud-item{background:var(--paper);padding:24px 26px}
   .aud-item h3{font-size:20px;margin:0 0 8px}
   .aud-item p{margin:0;color:var(--ink-soft);font-size:15.5px}
+  /* lead form */
+  .lead-form{margin-top:26px;display:grid;gap:16px}
+  .lead-form .row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .lead-form label{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#9a9a92;margin-bottom:7px}
+  .lead-form input[type=text],.lead-form select,.lead-form textarea{
+    width:100%;background:#1b2124;border:1px solid #4b5457;border-radius:2px;padding:12px 14px;
+    font:inherit;font-size:15.5px;color:var(--paper)
+  }
+  .lead-form input::placeholder,.lead-form textarea::placeholder{color:#8a8f8c}
+  .lead-form select{
+    appearance:none;padding-right:40px;
+    background:#1b2124 url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23f3f1ec' stroke-width='1.6'/%3E%3C/svg%3E") no-repeat right 14px center;
+  }
+  .lead-form textarea{resize:vertical}
+  .lead-form .consent{display:flex;gap:10px;align-items:flex-start;font-size:14px;color:#c9c6bd;line-height:1.5;text-transform:none;letter-spacing:0;margin:0}
+  .lead-form .consent input{margin:3px 0 0}
+  .lead-form .consent a{color:#e7d3a8}
+  .form-status{font-size:14px;color:#e7d3a8;min-height:20px;margin:0}
+  .fallback{display:none;border-top:1px solid #3a4144;padding-top:16px}
+  .fallback-note{font-size:14px;color:#c9c6bd;margin:0 0 12px}
   @media(max-width:820px){
+    .lead-form .row{grid-template-columns:1fr}
     .aud{grid-template-columns:1fr}
     .stats{grid-template-columns:1fr 1fr}
     .svc{grid-template-columns:1fr;gap:12px}
@@ -456,11 +477,76 @@
     <div class="wrap contact-grid">
       <div>
         <h2>Обсудим задачу?</h2>
-        <p class="lead">Расскажите, что нужно сделать — ответим со сметой и сроком. Обычно это занимает один рабочий день.</p>
-        <div class="actions">
-          <a class="btn" href="https://vk.com/mitrofanovna" rel="noopener">Написать в VK</a>
-          <a class="btn ghost" href="#calc">Вернуться к смете</a>
-        </div>
+        <p class="lead">Оставьте заявку — ответим со сметой и сроком. Обычно это занимает один рабочий день.</p>
+
+        <form class="lead-form" id="lead-form" novalidate>
+          <div class="row">
+            <div>
+              <label for="lf-name">Как вас зовут</label>
+              <input id="lf-name" name="name" type="text" autocomplete="name" required placeholder="Имя">
+            </div>
+            <div>
+              <label for="lf-contact">Контакт для ответа</label>
+              <input id="lf-contact" name="contact" type="text" required placeholder="Telegram, MAX, телефон или почта">
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label for="lf-task">Задача</label>
+              <select id="lf-task" name="task">
+                <option>Ведение каналов и групп</option>
+                <option>Стратегия и развитие каналов</option>
+                <option>Автоматизация</option>
+                <option>Документы, презентации, аналитика</option>
+                <option>Сценарий мероприятия</option>
+                <option>Android-приложение</option>
+                <option>Реклама в приложении (РСЯ)</option>
+                <option>Видео, графика, промоушн</option>
+                <option>Другое</option>
+              </select>
+            </div>
+            <div>
+              <label for="lf-budget">Бюджет</label>
+              <select id="lf-budget" name="budget">
+                <option>до 10 тыс. ₽</option>
+                <option selected>10–30 тыс. ₽</option>
+                <option>30–100 тыс. ₽</option>
+                <option>100–300 тыс. ₽</option>
+                <option>больше 300 тыс. ₽</option>
+                <option>пока не определён</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label for="lf-comment">Что нужно сделать</label>
+            <textarea id="lf-comment" name="comment" rows="3" placeholder="Коротко о задаче, сроках и площадках"></textarea>
+          </div>
+
+          <input id="lf-gotcha" name="_gotcha" type="text" tabindex="-1" autocomplete="off" aria-label="Поле проверки на роботов, не заполняйте" style="display:none">
+
+          <label class="consent">
+            <input type="checkbox" id="lf-consent">
+            <span>Согласен на обработку персональных данных по <a href="privacy.html">политике конфиденциальности</a></span>
+          </label>
+
+          <div class="actions">
+            <button class="btn" type="submit" id="lf-submit">Отправить заявку</button>
+            <a class="btn ghost" href="#calc">Вернуться к смете</a>
+          </div>
+
+          <p class="form-status" id="lf-status" role="status" aria-live="polite"></p>
+
+          <div class="fallback" id="lf-fallback">
+            <p class="fallback-note">Текст заявки скопирован — отправьте его удобным способом:</p>
+            <div class="actions">
+              <a class="btn ghost" id="lf-max" href="#" rel="noopener">Открыть MAX</a>
+              <a class="btn ghost" id="lf-tg" href="#" rel="noopener">Открыть Telegram</a>
+              <a class="btn ghost" id="lf-mail" href="mailto:rajhert2018@yandex.ru">Отправить письмом</a>
+            </div>
+          </div>
+        </form>
       </div>
       <dl>
         <dt>Сообщество</dt>
@@ -481,7 +567,7 @@
 <footer>
   <div class="wrap">
     <span>© 2026 Студия Артёма Райхерта. Каналы, автоматизация, документы, Android.</span>
-    <span>Страница не собирает персональные данные: смета считается у вас в браузере.</span>
+    <span>Смета считается у вас в браузере. Заявка отправляется только с вашего согласия — <a href="privacy.html">политика конфиденциальности</a>.</span>
   </div>
 </footer>
 
@@ -638,6 +724,166 @@
   });
 
   fillScopes();
+})();
+</script>
+
+<script>
+(function(){
+  "use strict";
+
+  /* Куда отправлять заявки. Пока пусто — форма работает в ручном режиме:
+     собирает текст, копирует его и предлагает отправить в MAX / Telegram / почтой. */
+  var ENDPOINT = "";
+
+  /* Контакты для ручного режима — подставим, когда будут известны. */
+  var MAX_LINK = "";
+  var TG_LINK  = "";
+  var MAIL     = "rajhert2018@yandex.ru";
+
+  var form = document.getElementById("lead-form");
+  if(!form) return;
+
+  var status   = document.getElementById("lf-status");
+  var fallback = document.getElementById("lf-fallback");
+  var submit   = document.getElementById("lf-submit");
+  var nameEl   = document.getElementById("lf-name");
+  var contactEl= document.getElementById("lf-contact");
+  var taskEl   = document.getElementById("lf-task");
+  var budgetEl = document.getElementById("lf-budget");
+  var commentEl= document.getElementById("lf-comment");
+  var consentEl= document.getElementById("lf-consent");
+  var gotchaEl = document.getElementById("lf-gotcha");
+
+  function utm(){
+    var p = new URLSearchParams(location.search), out = [];
+    ["utm_source","utm_medium","utm_campaign","utm_content","utm_term"].forEach(function(k){
+      var v = p.get(k);
+      if(v) out.push(k + "=" + v);
+    });
+    return out.join("&");
+  }
+
+  function estimate(){
+    var s = document.getElementById("service");
+    var sc = document.getElementById("scope");
+    var total = document.getElementById("total");
+    if(!s || !sc || !total) return "";
+    try{
+      return s.options[s.selectedIndex].text + " · " +
+             sc.options[sc.selectedIndex].text + " · " +
+             total.textContent.trim();
+    }catch(e){ return ""; }
+  }
+
+  function collect(){
+    return {
+      name: nameEl.value.trim(),
+      contact: contactEl.value.trim(),
+      task: taskEl.value,
+      budget: budgetEl.value,
+      comment: commentEl.value.trim(),
+      estimate: estimate(),
+      utm: utm(),
+      page: location.href,
+      sent: new Date().toISOString()
+    };
+  }
+
+  function asText(d){
+    return "Заявка с сайта студии Артёма Райхерта\n" +
+      "Имя: " + d.name + "\n" +
+      "Контакт: " + d.contact + "\n" +
+      "Задача: " + d.task + "\n" +
+      "Бюджет: " + d.budget + "\n" +
+      (d.comment ? "Комментарий: " + d.comment + "\n" : "") +
+      (d.estimate ? "Смета: " + d.estimate + "\n" : "") +
+      (d.utm ? "Источник: " + d.utm + "\n" : "");
+  }
+
+  function copy(text, cb){
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(cb, cb);
+    } else {
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly","");
+      ta.style.position = "fixed";
+      ta.style.top = "-1000px";
+      document.body.appendChild(ta);
+      ta.select();
+      try{ document.execCommand("copy"); }catch(e){}
+      document.body.removeChild(ta);
+      cb();
+    }
+  }
+
+  function showFallback(text){
+    copy(text, function(){
+      var enc = encodeURIComponent(text);
+      var max = document.getElementById("lf-max");
+      var tg  = document.getElementById("lf-tg");
+      var mail= document.getElementById("lf-mail");
+
+      if(MAX_LINK){ max.href = MAX_LINK; } else { max.style.display = "none"; }
+
+      if(TG_LINK){
+        tg.href = TG_LINK + (TG_LINK.indexOf("?") > -1 ? "&" : "?") + "text=" + enc;
+      } else {
+        tg.style.display = "none";
+      }
+
+      mail.href = "mailto:" + MAIL +
+        "?subject=" + encodeURIComponent("Заявка с сайта студии Артёма Райхерта") +
+        "&body=" + enc;
+
+      fallback.style.display = "block";
+      status.textContent = "Проверьте заявку и отправьте её одним нажатием.";
+    });
+  }
+
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+
+    if(gotchaEl && gotchaEl.value) return;
+
+    if(!nameEl.value.trim() || !contactEl.value.trim()){
+      status.textContent = "Заполните имя и контакт — иначе не сможем ответить.";
+      nameEl.focus();
+      return;
+    }
+    if(!consentEl.checked){
+      status.textContent = "Отметьте согласие на обработку данных.";
+      consentEl.focus();
+      return;
+    }
+
+    var data = collect();
+    var text = asText(data);
+
+    if(!ENDPOINT){
+      showFallback(text);
+      return;
+    }
+
+    submit.disabled = true;
+    status.textContent = "Отправляем…";
+
+    fetch(ENDPOINT, {
+      method: "POST",
+      headers: {"Content-Type": "application/json", "Accept": "application/json"},
+      body: JSON.stringify(data)
+    }).then(function(r){
+      if(!r.ok) throw new Error("HTTP " + r.status);
+      status.textContent = "Заявка отправлена. Ответим в течение рабочего дня.";
+      form.reset();
+      fallback.style.display = "none";
+    }).catch(function(){
+      status.textContent = "Автоотправка не сработала — отправьте заявку вручную.";
+      showFallback(text);
+    }).then(function(){
+      submit.disabled = false;
+    });
+  });
 })();
 </script>
 </body>
