@@ -873,8 +873,8 @@
 
     fetch(ENDPOINT, {
       method: "POST",
-      headers: {"Content-Type": "application/json", "Accept": "application/json"},
-      body: JSON.stringify(data)
+      headers: {"Content-Type": "application/x-www-form-urlencoded", "Accept": "application/json"},
+      body: new URLSearchParams(data).toString()
     }).then(function(r){
       if(!r.ok) throw new Error("HTTP " + r.status);
       return r.json().catch(function(){ return {success:"true"}; });
