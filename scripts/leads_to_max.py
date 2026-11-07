@@ -85,6 +85,11 @@ def body_html_raw(msg) -> str:
                 payload = part.get_payload(decode=True) or b""
                 charset = part.get_content_charset() or "utf-8"
                 return payload.decode(charset, errors="replace")
+        return ""
+    if msg.get_content_type() == "text/html":
+        payload = msg.get_payload(decode=True) or b""
+        charset = msg.get_content_charset() or "utf-8"
+        return payload.decode(charset, errors="replace")
     return ""
 
 
