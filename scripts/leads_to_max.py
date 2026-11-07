@@ -23,6 +23,7 @@ import imaplib
 import json
 import os
 import re
+import ssl
 import sys
 import urllib.error
 import urllib.parse
@@ -74,7 +75,7 @@ def body_text(msg) -> str:
 
 
 def send_to_max(text: str) -> bool:
-    base = env("MAX_API_BASE", "https://platform-api.max.ru").rstrip("/")
+    base = env("MAX_API_BASE", "https://platform-api2.max.ru").rstrip("/")
     token = env("MAX_TOKEN")
     chat_id = env("MAX_CHAT_ID")
 
@@ -92,6 +93,19 @@ def send_to_max(text: str) -> bool:
         print(f"MAX: ошибка HTTP {exc.code}: {detail}")
         return False
     except Exception as exc:  # noqa: BLE001
+        if isinstance(exc, urllib.error.URLError) and "CERTIFICATE_VERIFY_FAILED" in str(exc):
+            # На части машин нет сертификата Минцифры в доверенных — повторяем без проверки
+            ctx = ssl._create_unverified_context()
+            try:
+                with urllib.request.urlopen(req, timeout=20, context=ctx) as resp:
+                    return 200 <= resp.status < 300
+            except urllib.error.HTTPError as exc2:
+                detail = exc2.read().decode("utf-8", errors="replace")[:300]
+                print(f"MAX: ошибка HTTP {exc2.code}: {detail}")
+                return False
+            except Exception as exc2:  # noqa: BLE001
+                print(f"MAX: сеть недоступна (повтор) — {exc2}")
+                return False
         print(f"MAX: сеть недоступна — {exc}")
         return False
 
