@@ -128,17 +128,22 @@ def clean_lead(subject: str, html: str) -> str:
     return "\n".join(lines)
 
 
-def message_ids(box, folder: str, quoted: bool = False) -> set:
-    """Message-ID писем в папке (для проверки «уже обработано»)."""
+def message_ids(box, folder: str, quoted: bool = False):
+    """Message-ID писем в папке (для проверки «уже обработано»).
+
+    Возвращает set с Message-ID или None, если папку прочитать не удалось.
+    None — сигнал «дедуп недоступен»: в этом случае отправку запуска надо
+    пропустить целиком, иначе можно устроить повторную рассылку старых писем.
+    """
     ids = set()
     name = ('"' + folder + '"') if quoted else folder
     try:
         typ, _ = box.select(name)
         if typ != "OK":
-            return ids
+            return None
         typ, data = box.search(None, "ALL")
         if typ != "OK":
-            return ids
+            return None
         for num in data[0].split():
             typ, d = box.fetch(num, "(BODY.PEEK[HEADER.FIELDS (MESSAGE-ID)])")
             if typ != "OK" or not d or not isinstance(d[0], tuple):
@@ -148,11 +153,19 @@ def message_ids(box, folder: str, quoted: bool = False) -> set:
                 ids.add(found.group(1).decode("ascii", "replace").strip().lower())
     except Exception as exc:  # noqa: BLE001
         print(f"Архив: не удалось прочитать — {exc}")
+        return None
     return ids
 
 
-def archive_lead(box, num) -> None:
-    """Кладёт письмо в папку «Заявки», чтобы больше его не обрабатывать."""
+def archive_lead(box, num, msg_id: str) -> bool:
+    """Переносит письмо в папку «Заявки» и удаляет оригинал из Входящих.
+
+    Порядок — чтобы ничего не потерять:
+    1. Копирует письмо в «Заявки».
+    2. Проверяет, что копия реально там есть (по Message-ID).
+    3. Только после этого помечает оригинал во Входящих как удалённый.
+    Возвращает True, если письмо перемещено, False — если нет.
+    """
     try:
         box.select("INBOX")
     except Exception:  # noqa: BLE001
@@ -161,8 +174,30 @@ def archive_lead(box, num) -> None:
         typ, _ = box.copy(num, '"' + ARCHIVE_FOLDER_UTF7 + '"')
         if typ != "OK":
             print(f"Архив: копирование {num} не удалось")
+            return False
     except Exception as exc:  # noqa: BLE001
         print(f"Архив: копирование {num} — {exc}")
+        return False
+
+    archived = message_ids(box, ARCHIVE_FOLDER_UTF7, quoted=True)
+    found = False
+    # message_ids() переключил выбранную папку на «Заявки» — обязательно
+    # возвращаемся во Входящие, иначе \Deleted поставится не тому письму
+    try:
+        box.select("INBOX")
+    except Exception:  # noqa: BLE001
+        pass
+    if archived is None:
+        print(f"Архив: не удалось проверить копию {num} — оригинал не удаляю")
+    elif msg_id and msg_id in archived:
+        try:
+            box.store(num, "+FLAGS", "\\Deleted")
+            found = True
+        except Exception as exc:  # noqa: BLE001
+            print(f"Архив: пометка {num} на удаление — {exc}")
+    else:
+        print(f"Архив: копия {num} не найдена в «Заявки» — оригинал не удаляю")
+    return found
 
 
 def send_to_max(text: str) -> bool:
@@ -250,6 +285,9 @@ def main() -> int:
     try:
         since = (datetime.date.today() - datetime.timedelta(days=IMAP_LOOKBACK_DAYS)).strftime("%d-%b-%Y")
         archived = message_ids(box, ARCHIVE_FOLDER_UTF7, quoted=True)
+        if archived is None:
+            print("Архив «Заявки» недоступен — пропускаю запуск, чтобы не создавать дубли.")
+            return 1
         try:
             typ, _ = box.select("INBOX")
             if typ != "OK":
@@ -296,6 +334,10 @@ def main() -> int:
 
             msg_id = re.sub(r"[<>]", "", (msg.get("Message-ID") or "")).strip().lower()
             if msg_id and msg_id in archived:
+                try:
+                    box.store(num, "+FLAGS", "\\Deleted")
+                except Exception:
+                    pass
                 continue
 
             payload = clean_lead(subject, body_html_raw(msg))
@@ -313,10 +355,17 @@ def main() -> int:
                     box.store(num, "+FLAGS", "\\Seen")
                 except Exception:
                     pass
-                archive_lead(box, num)
+                moved = archive_lead(box, num, msg_id)
+                if not moved:
+                    print(f"Архив: {subject[:60]!r} осталось во Входящих — проверьте папку «Заявки»")
             else:
                 failed += 1
     finally:
+        try:
+            box.select("INBOX")
+            box.expunge()
+        except Exception:
+            pass
         try:
             box.logout()
         except Exception:
