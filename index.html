@@ -323,16 +323,16 @@
   /* scene backdrop v2: continuous scroll blend */
   .scene-bg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
   .scene{position:absolute;inset:-5%;opacity:0;will-change:opacity}
-  .scene img{width:100%;height:100%;object-fit:cover;display:block;transform:translate3d(0,calc(var(--p,0) * -60px * var(--speed,1)),0) scale(1.06);filter:blur(1.4px) saturate(.84) contrast(1.05) sepia(.06);will-change:transform}
-  .scene[data-scene="datacenter"]{--speed:.55;opacity:calc(var(--w-datacenter,0) * .13)}
-  .scene[data-scene="datacenter"] img{filter:blur(1.4px) brightness(.62) contrast(1.12) saturate(.78) sepia(.03)}
-  .scene[data-scene="coffee"]{--speed:.8;opacity:calc(var(--w-coffee,0) * .12)}
-  .scene[data-scene="film"]{--speed:.7;opacity:calc(var(--w-film,0) * .13)}
-  .scene[data-scene="banknote"]{--speed:1;opacity:calc(var(--w-banknote,0) * .10)}
-  .scene[data-scene="film"] img{filter:blur(1.2px) brightness(.58) contrast(1.22) saturate(.80) sepia(.04)}
-  .scene[data-scene="banknote"] img{filter:blur(4px) saturate(.78) contrast(.95) brightness(.98) sepia(.06)}
+  .scene img{width:100%;height:100%;object-fit:cover;display:block;transform:translate3d(0,calc(var(--p,0) * -60px * var(--speed,1)),0) scale(1.06);filter:blur(1.0px) saturate(.88) contrast(1.05) sepia(.04);will-change:transform}
+  .scene[data-scene="datacenter"]{--speed:.55;opacity:calc(var(--w-datacenter,0) * .24)}
+  .scene[data-scene="datacenter"] img{filter:blur(1.0px) brightness(.85) contrast(1.08) saturate(.90) sepia(.02)}
+  .scene[data-scene="coffee"]{--speed:.8;opacity:calc(var(--w-coffee,0) * .22)}
+  .scene[data-scene="film"]{--speed:.7;opacity:calc(var(--w-film,0) * .24)}
+  .scene[data-scene="banknote"]{--speed:1;opacity:calc(var(--w-banknote,0) * .18)}
+  .scene[data-scene="film"] img{filter:blur(1.0px) brightness(.78) contrast(1.12) saturate(.90) sepia(.03)}
+  .scene[data-scene="banknote"] img{filter:blur(2.2px) saturate(.85) contrast(.92) brightness(1.0) sepia(.04)}
   .scene-bg::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
-    background:linear-gradient(180deg,rgba(243,241,236,.94) 0%,rgba(243,241,236,0) 11%,rgba(243,241,236,0) 89%,rgba(243,241,236,.94) 100%)}
+    background:linear-gradient(180deg,rgba(243,241,236,.84) 0%,rgba(243,241,236,0) 9%,rgba(243,241,236,0) 91%,rgba(243,241,236,.84) 100%)}
   header,footer{position:relative;z-index:2}
   @media (max-width:900px){.scene-bg{display:none}}
   @media (prefers-reduced-motion:reduce){.scene img{transform:none}}
