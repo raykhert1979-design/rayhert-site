@@ -918,6 +918,7 @@
     }).then(function(res){
       if(res && String(res.success) === "false") throw new Error(res.message || "not active");
       status.textContent = "Заявка отправлена. Ответим в течение рабочего дня.";
+      if(typeof window.ym === "function"){ window.ym(114127728, "reachGoal", "form_submit"); }
       form.reset();
       fallback.style.display = "none";
     }).catch(function(){
@@ -942,6 +943,13 @@
   @media (min-width:720px){.cookie{left:24px;right:auto}}
   @media print{.cookie{display:none}}
 </style>
+<script>
+/* Цели Метрики: клик по ссылке MAX */
+document.addEventListener("click", function(e){
+  var a = e.target && e.target.closest ? e.target.closest('a[href*="max.ru"]') : null;
+  if(a && typeof window.ym === "function"){ window.ym(114127728, "reachGoal", "max_click"); }
+});
+</script>
 <div class="cookie" id="cookie-note" hidden role="region" aria-label="Уведомление о cookie">
   <p>Сайт использует cookie для статистики. <a href="privacy.html">Подробнее</a></p>
   <button type="button" id="cookie-ok">Понятно</button>
