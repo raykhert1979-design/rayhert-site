@@ -345,6 +345,16 @@
   @media (max-width:900px){.scene-bg{display:none}}
   @media (prefers-reduced-motion:reduce){.scene img{transform:none}}
 
+  /* readability over the photo backdrop */
+  main > section:not(.contact){--muted:#444a47;--ink-soft:#1d2326}
+  header{--muted:#444a47;--ink-soft:#1d2326}
+  main > section:not(.contact){
+    background:radial-gradient(ellipse 140% 70% at 50% 42%,rgba(243,241,236,.30) 0%,rgba(243,241,236,.19) 55%,rgba(243,241,236,.08) 78%,rgba(243,241,236,0) 100%)
+  }
+  main > section:not(.contact) :where(h1,h2,h3,p,li,.lead,.sec-note,.kicker,.stat span,.price small,.out .term,.out .hint,details p){
+    text-shadow:0 1px 0 rgba(243,241,236,.58)
+  }
+
 </style>
 </head>
 <body>
