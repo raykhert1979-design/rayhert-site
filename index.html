@@ -331,6 +331,14 @@
   .scene[data-scene="banknote"]{--speed:1;opacity:calc(var(--w-banknote,0) * .18)}
   .scene[data-scene="film"] img{filter:blur(1.0px) brightness(.78) contrast(1.12) saturate(.90) sepia(.03)}
   .scene[data-scene="banknote"] img{filter:blur(2.2px) saturate(.85) contrast(.92) brightness(1.0) sepia(.04)}
+  .scene[data-scene="supercomputer"]{--speed:.65;opacity:calc(var(--w-supercomputer,0) * .20)}
+  .scene[data-scene="supercomputer"] img{filter:blur(1.2px) brightness(.70) contrast(1.14) saturate(.86) sepia(.02)}
+  .scene[data-scene="people"]{--speed:.75;opacity:calc(var(--w-people,0) * .16)}
+  .scene[data-scene="people"] img{filter:blur(.8px) brightness(.92) contrast(1.03) saturate(.90) sepia(.02)}
+  .scene[data-scene="businessman"]{--speed:.9;opacity:calc(var(--w-businessman,0) * .18)}
+  .scene[data-scene="businessman"] img{filter:blur(1.2px) brightness(.88) contrast(1.08) saturate(.92) sepia(.03)}
+  .scene[data-scene="film-money"]{--speed:.8;opacity:calc(var(--w-film-money,0) * .17)}
+  .scene[data-scene="film-money"] img{filter:blur(1.4px) brightness(.74) contrast(1.12) saturate(.86) sepia(.03)}
   .scene-bg::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
     background:linear-gradient(180deg,rgba(243,241,236,.84) 0%,rgba(243,241,236,0) 9%,rgba(243,241,236,0) 91%,rgba(243,241,236,.84) 100%)}
   header,footer{position:relative;z-index:2}
@@ -346,6 +354,10 @@
   <div class="scene" data-scene="datacenter"><img src="scene-datacenter-16x9.jpg" alt="" decoding="async"></div>
   <div class="scene" data-scene="coffee"><img src="scene-coffee5-16x9.jpg" alt="" decoding="async"></div>
   <div class="scene" data-scene="film"><img src="scene-film-16x9.jpg" alt="" decoding="async"></div>
+  <div class="scene" data-scene="supercomputer"><img src="scene-supercomputer-16x9.jpg" alt="" decoding="async"></div>
+  <div class="scene" data-scene="people"><img src="scene-people-16x9.jpg" alt="" decoding="async"></div>
+  <div class="scene" data-scene="businessman"><img src="scene-businessman-16x9.jpg" alt="" decoding="async"></div>
+  <div class="scene" data-scene="film-money"><img src="scene-film-money-16x9.jpg" alt="" decoding="async"></div>
 </div>
 
 
@@ -1260,12 +1272,12 @@ document.addEventListener("click", function(e){
     [document.getElementById("who"), "coffee"],
     [document.getElementById("services"), "banknote"],
     [document.getElementById("how"), "film"],
-    [document.getElementById("cases"), "banknote"],
-    [document.getElementById("calc"), "banknote"],
-    [document.getElementById("faq"), "banknote"],
-    [document.getElementById("contact"), "banknote"]
+    [document.getElementById("cases"), "film-money"],
+    [document.getElementById("calc"), "supercomputer"],
+    [document.getElementById("faq"), "people"],
+    [document.getElementById("contact"), "businessman"]
   ];
-  const names = ["datacenter", "coffee", "film", "banknote"];
+  const names = ["datacenter", "coffee", "film", "banknote", "film-money", "supercomputer", "people", "businessman"];
   const body = document.body;
   let centers = [];
   function measure() {
@@ -1277,7 +1289,7 @@ document.addEventListener("click", function(e){
   function smooth(t) { return t * t * (3 - 2 * t); }
   function update() {
     const pos = window.scrollY + window.innerHeight * 0.30;
-    const w = {datacenter: 0, coffee: 0, film: 0, banknote: 0};
+    const w = Object.fromEntries(names.map(n => [n, 0]));
     if (!centers.length) return;
     if (pos <= centers[0].y) {
       w[centers[0].scene] = 1;
