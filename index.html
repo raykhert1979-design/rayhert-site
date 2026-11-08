@@ -228,22 +228,13 @@
 
   /* reviews */
   .reviews{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:26px}
+  .reviews:empty{display:none}
   .review{background:var(--paper);border:1px solid var(--line);padding:24px 26px}
   .review.pending{border-left:3px solid var(--brass)}
   .review-top{display:flex;justify-content:space-between;align-items:baseline;gap:14px;margin-bottom:8px}
   .review-top b{font-family:Georgia,serif;font-weight:400;font-size:18px;color:var(--ink)}
   .review-stars{color:var(--brass);font-size:15px;letter-spacing:.14em;white-space:nowrap}
   .review p{margin:0;color:var(--ink-soft);font-size:15.5px;line-height:1.55}
-  .review-meta{margin-top:12px;font-size:12px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase}
-  .review-badge{display:inline-block;margin-top:12px;font-size:11px;letter-spacing:.09em;text-transform:uppercase;
-    color:#8a5a12;border:1px solid var(--brass);background:#fbf3e4;border-radius:2px;padding:3px 9px}
-  .reviews-proof{grid-column:1/-1;background:var(--paper);border:1px dashed var(--line);margin:0;padding:24px 26px;color:var(--ink-soft);font-size:15.5px}
-  .reviews-proof[hidden]{display:none}
-  .reviews-proof b{display:block;font-family:Georgia,serif;font-weight:400;font-size:20px;margin-bottom:8px;color:var(--ink)}
-  .reviews-proof p{margin:0 0 10px}
-  .reviews-proof ul{margin:0 0 10px;padding-left:18px}
-  .reviews-proof li{margin-bottom:6px}
-  .reviews-proof a{color:var(--accent)}
   .review-form{margin-top:26px;background:#faf8f3;border:1px solid var(--line);padding:clamp(20px,3vw,34px)}
   .review-form h3{font-size:23px;margin:0 0 16px}
   .review-form .row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
@@ -600,27 +591,15 @@
   <section id="reviews">
     <div class="wrap">
       <div class="sec-head"><span class="num">07</span><h2>Отзывы</h2></div>
-      <p class="sec-note">Публикуем только настоящие отзывы — после проверки. Выдуманных здесь не будет: лучше пусто, чем неправда.</p>
 
       <div class="reviews" id="reviews-list">
-        <!-- ШАБЛОН ДЛЯ ПУБЛИКАЦИИ ПОСЛЕ МОДЕРАЦИИ. Удалите блок «Пока отзывов нет», когда выйдет первый отзыв.
+        <!-- ШАБЛОН ДЛЯ ПУБЛИКАЦИИ ПОСЛЕ МОДЕРАЦИИ:
         <article class="review">
           <div class="review-top"><b>Имя</b><span class="review-stars">★★★★★</span></div>
           <p>Текст отзыва.</p>
           <div class="review-meta">Проект · 08.11.2026</div>
         </article>
         -->
-        <div class="reviews-proof" id="reviews-empty">
-          <b>Первые отзывы появятся после проектов</b>
-          <p>Пока их нет — вот что можно проверить прямо сейчас, без обещаний:</p>
-          <ul>
-            <li><a href="#cases">Пять работающих проектов</a> — каналы, сообщество, YouTube, приложение.</li>
-            <li>142 обновления приложения в RuStore и рейтинг 4,9.</li>
-            <li>113 900 подписчиков на каналах «Митрофановна».</li>
-            <li>Восемь площадок, которые ведём одновременно.</li>
-          </ul>
-          <p>Хотите оставить первый отзыв о работе студии — форма ниже.</p>
-        </div>
       </div>
 
       <form class="review-form" id="review-form" novalidate>
