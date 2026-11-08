@@ -248,6 +248,16 @@
   .about-body .about-kicker{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin:0 0 10px}
   .about-body .about-sub{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 24px}
   .about-body .about-lead{font-size:clamp(18px,2.2vw,21px);line-height:1.5;color:var(--ink-soft);margin:0 0 10px;max-width:62ch}
+  .about-top{display:grid;grid-template-columns:1.3fr .75fr;gap:clamp(20px,4vw,44px);align-items:center;margin:0 0 8px}
+  .about-txt .about-title{margin-bottom:6px}
+  .about-sign{font-family:Georgia,"Times New Roman",serif;font-weight:400;font-size:clamp(19px,2.3vw,25px);line-height:1.25;
+    color:var(--ink);margin:0 0 12px}
+  .about-sign em{font-style:italic;color:var(--accent)}
+  .about-photo{margin:0;position:relative}
+  .about-photo img{display:block;width:100%;height:auto;border-radius:16px;border:1px solid var(--line);
+    box-shadow:0 18px 44px rgba(20,24,27,.18)}
+  .about-photo::after{content:"";position:absolute;inset:auto -10px -10px auto;width:52%;height:52%;
+    border-right:2px solid var(--brass);border-bottom:2px solid var(--brass);border-radius:0 0 16px 0;pointer-events:none}
   .about-body .about-note{font-size:13px;color:var(--muted);line-height:1.5}
   .about-body .about-fine{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px;margin-top:6px}
   .about-quote{border-left:3px solid var(--brass);padding:2px 0 2px 18px;margin:0 0 16px;font-family:Georgia,serif;
@@ -270,6 +280,8 @@
     .about-modal{padding:0}
     .about-panel{max-height:100dvh;height:100dvh;border:0;border-radius:0}
     .about-cards{grid-template-columns:1fr}
+    .about-top{grid-template-columns:1fr}
+    .about-photo{max-width:340px;margin:0 auto}
   }
   @media print{.about-modal{display:none}}
 
@@ -779,9 +791,17 @@
       <button class="about-close" type="button" data-about-close aria-label="Закрыть рассказ">×</button>
     </div>
     <article class="about-body">
-      <p class="about-kicker">Кто стоит за студией</p>
-      <h2 class="about-title" id="about-title">Артём Райхерт</h2>
-      <p class="about-sub">Студия автоматизации каналов и продуктов · Челябинск, работаем по всей России</p>
+      <div class="about-top">
+        <div class="about-txt">
+          <p class="about-kicker">Кто стоит за студией</p>
+          <h2 class="about-title" id="about-title">Артём Райхерт</h2>
+          <p class="about-sub">Студия автоматизации каналов и продуктов · Челябинск, работаем по всей России</p>
+          <p class="about-sign">Студия Артёма Райхерта — <em>автоматизации каналов и&nbsp;продуктов</em></p>
+        </div>
+        <figure class="about-photo" aria-label="Артём Райхерт в студии">
+          <img src="about-photo.jpg" alt="Артём Райхерт, руководитель студии, в студии звукозаписи" width="900" height="1200" loading="lazy">
+        </figure>
+      </div>
       <p class="about-lead" id="about-lead">Я собираю каналы, приложения и документы так, чтобы они работали без вашего ежедневного участия. Вы занимаетесь своим делом — материалы выходят по расписанию, отчёты приходят сами, заявки не теряются. Сотрудничество со мной — это не «попробуем»: это задача, смета, срок и результат, который можно открыть и проверить.</p>
 
       <h3 class="about-h3">Результат вместо обещаний</h3>
