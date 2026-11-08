@@ -36,6 +36,8 @@ IMAP_HOST = "imap.yandex.ru"
 IMAP_LOOKBACK_DAYS = 3
 MAX_PER_RUN = 100
 ARCHIVE_FOLDER = "Заявки"
+# имя папки в modified UTF-7 — так его ждёт IMAP Яндекса
+ARCHIVE_FOLDER_UTF7 = "&BB4EQgQ,BEAEMAQyBDsENQQ9BD0ESwQ1-"
 
 
 def env(name: str, default: str = "") -> str:
@@ -125,6 +127,43 @@ def clean_lead(subject: str, html: str) -> str:
     return "\n".join(lines)
 
 
+def message_ids(box, folder: str, quoted: bool = False) -> set:
+    """Message-ID писем в папке (для проверки «уже обработано»)."""
+    ids = set()
+    name = ('"' + folder + '"') if quoted else folder
+    try:
+        typ, _ = box.select(name)
+        if typ != "OK":
+            return ids
+        typ, data = box.search(None, "ALL")
+        if typ != "OK":
+            return ids
+        for num in data[0].split():
+            typ, d = box.fetch(num, "(BODY.PEEK[HEADER.FIELDS (MESSAGE-ID)])")
+            if typ != "OK" or not d or not isinstance(d[0], tuple):
+                continue
+            found = re.search(rb"<([^>]+)>", d[0][1])
+            if found:
+                ids.add(found.group(1).decode("ascii", "replace").strip().lower())
+    except Exception as exc:  # noqa: BLE001
+        print(f"Архив: не удалось прочитать — {exc}")
+    return ids
+
+
+def archive_lead(box, num) -> None:
+    """Кладёт письмо в папку «Заявки», чтобы больше его не обрабатывать."""
+    try:
+        box.select("INBOX")
+    except Exception:  # noqa: BLE001
+        pass
+    try:
+        typ, _ = box.copy(num, '"' + ARCHIVE_FOLDER_UTF7 + '"')
+        if typ != "OK":
+            print(f"Архив: копирование {num} не удалось")
+    except Exception as exc:  # noqa: BLE001
+        print(f"Архив: копирование {num} — {exc}")
+
+
 def send_to_max(text: str) -> bool:
     base = env("MAX_API_BASE", "https://platform-api2.max.ru").rstrip("/") or "https://platform-api2.max.ru"
     token = env("MAX_TOKEN")
@@ -186,7 +225,9 @@ def main() -> int:
         box.select("INBOX")
 
         since = (datetime.date.today() - datetime.timedelta(days=IMAP_LOOKBACK_DAYS)).strftime("%d-%b-%Y")
-        typ, data = box.search(None, f'(UNSEEN SENTSINCE {since})')
+        archived = message_ids(box, ARCHIVE_FOLDER_UTF7, quoted=True)
+        box.select("INBOX")
+        typ, data = box.search(None, f'(SENTSINCE {since})')
         if typ != "OK":
             print("IMAP: поиск писем не удался")
             return 1
@@ -194,7 +235,7 @@ def main() -> int:
         ids = data[0].split()
         if len(ids) > MAX_PER_RUN:
             ids = ids[-MAX_PER_RUN:]
-        print(f"Непрочитанных писем (за {IMAP_LOOKBACK_DAYS} дн.): {len(ids)}")
+        print(f"Писем к обработке (за {IMAP_LOOKBACK_DAYS} дн.): {len(ids)}, уже в архиве: {len(archived)}")
 
         for num in ids:
             try:
@@ -223,6 +264,10 @@ def main() -> int:
             if marker.lower() not in (subject + " " + text).lower():
                 continue
 
+            msg_id = re.sub(r"[<>]", "", (msg.get("Message-ID") or "")).strip().lower()
+            if msg_id and msg_id in archived:
+                continue
+
             payload = clean_lead(subject, body_html_raw(msg))
             if len(payload) > 3500:
                 payload = payload[:3500] + "\n…сообщение обрезано"
@@ -238,10 +283,7 @@ def main() -> int:
                     box.store(num, "+FLAGS", "\\Seen")
                 except Exception:
                     pass
-                try:
-                    box.copy(num, ARCHIVE_FOLDER)
-                except Exception:
-                    pass
+                archive_lead(box, num)
             else:
                 failed += 1
     finally:
