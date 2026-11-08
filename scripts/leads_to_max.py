@@ -284,7 +284,21 @@ def main() -> int:
     failed = 0
     try:
         since = (datetime.date.today() - datetime.timedelta(days=IMAP_LOOKBACK_DAYS)).strftime("%d-%b-%Y")
-        archived = message_ids(box, ARCHIVE_FOLDER_UTF7, quoted=True)
+        archived = None
+        for attempt in range(1, 5):
+            archived = message_ids(box, ARCHIVE_FOLDER_UTF7, quoted=True)
+            if archived is not None:
+                break
+            print(f"Архив: чтение не удалось (попытка {attempt}/4) — переподключаюсь")
+            try:
+                box.logout()
+            except Exception:  # noqa: BLE001
+                pass
+            try:
+                box = connect_box(login, password)
+            except Exception as exc:  # noqa: BLE001
+                print(f"Архив: переподключение — {exc}")
+                break
         if archived is None:
             print("Архив «Заявки» недоступен — пропускаю запуск, чтобы не создавать дубли.")
             return 1
