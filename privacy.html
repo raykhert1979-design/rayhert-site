@@ -79,7 +79,7 @@
     <li>выбранную в калькуляторе смету;</li>
     <li>технические метки источника перехода (UTM) и дату отправки.</li>
   </ul>
-  <p>Мы не собираем паспортные данные, сведения о здоровье, политических взглядах и другие специальные категории данных. Сайт не использует файлы cookie для слежения за вами между сайтами.</p>
+  <p>Мы не собираем паспортные данные, сведения о здоровье, политических взглядах и другие специальные категории данных. Для собственной статистики сайт использует файлы cookie и Яндекс.Метрику — подробнее в разделе 6.</p>
 
   <h2>3. Зачем обрабатываем</h2>
   <table>
@@ -97,11 +97,16 @@
   <ul>
     <li>лично оператору — для ответа на заявку;</li>
     <li>сервису приёма форм, который доставляет заявку с сайта, — в объёме, необходимом для доставки;</li>
-    <li>почтовому сервису оператора — как архив заявок.</li>
+    <li>почтовому сервису оператора — как архив заявок;</li>
+    <li>сервису веб-аналитики Яндекс.Метрика — обезличенные данные о посещениях.</li>
   </ul>
   <p>Передача в иные организации и за пределы Российской Федерации не осуществляется.</p>
 
-  <h2>6. Ваши права</h2>
+  <h2>6. Файлы cookie и аналитика</h2>
+  <p>Сайт использует файлы cookie и похожие технологии только для собственной статистики. Мы подключили Яндекс.Метрику (счётчик 114127728): она считает посещения, просмотры страниц и клики и помогает понять, какие разделы полезны. Данные обрабатываются в обезличенном виде.</p>
+  <p>Вы можете отключить cookie в настройках браузера — сайт продолжит работать, но статистика будет неполной.</p>
+
+  <h2>7. Ваши права</h2>
   <ul>
     <li>знать, какие данные о вас есть у оператора;</li>
     <li>требовать уточнения, блокирования или удаления данных;</li>
@@ -110,10 +115,10 @@
   </ul>
   <p>Для отзыва согласия или удаления данных напишите на <a href="mailto:rajhert2018@yandex.ru">rajhert2018@yandex.ru</a> с темой «Отзыв согласия». Мы удалим данные в течение 10 рабочих дней и сообщим об этом.</p>
 
-  <h2>7. Как защищаем</h2>
+  <h2>8. Как защищаем</h2>
   <p>Доступ к заявкам есть только у оператора. Сайт работает по HTTPS. Токены и пароли сервисов доставки хранятся в защищённом хранилище и не попадают в код сайта.</p>
 
-  <h2>8. Изменения политики</h2>
+  <h2>9. Изменения политики</h2>
   <p>Если правила изменятся, новая редакция появится на этой странице с новой датой. Существенные изменения касаются только новых заявок.</p>
 </main>
 
@@ -121,5 +126,34 @@
   <div class="wrap">© 2026 Студия Артёма Райхерта · <a href="index.html">райхерт.рф</a></div>
 </footer>
 
+<style>
+  .cookie{position:fixed;left:16px;right:16px;bottom:16px;z-index:60;max-width:520px;
+    background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+    padding:14px 16px;box-shadow:0 8px 28px rgba(20,24,27,.10);font-size:14px;line-height:1.45;
+    color:var(--ink-soft);display:flex;gap:14px;align-items:center;flex-wrap:wrap;justify-content:space-between}
+  .cookie p{margin:0;max-width:330px}
+  .cookie a{color:var(--accent)}
+  .cookie button{flex:none;padding:9px 16px;border:1px solid var(--ink);background:var(--ink);color:var(--paper);
+    font:inherit;font-size:14px;border-radius:var(--radius);cursor:pointer}
+  .cookie button:hover{background:var(--accent);border-color:var(--accent)}
+  @media (min-width:720px){.cookie{left:24px;right:auto}}
+  @media print{.cookie{display:none}}
+</style>
+<div class="cookie" id="cookie-note" hidden role="region" aria-label="Уведомление о cookie">
+  <p>Сайт использует cookie для статистики. <a href="privacy.html">Подробнее</a></p>
+  <button type="button" id="cookie-ok">Понятно</button>
+</div>
+<script>
+(function(){
+  var note = document.getElementById('cookie-note');
+  try{ if(localStorage.getItem('cookie_ok') === '1') return; }catch(e){}
+  if(note) note.hidden = false;
+  var btn = document.getElementById('cookie-ok');
+  if(btn) btn.addEventListener('click', function(){
+    try{ localStorage.setItem('cookie_ok', '1'); }catch(e){}
+    if(note) note.hidden = true;
+  });
+})();
+</script>
 </body>
 </html>
