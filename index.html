@@ -272,6 +272,19 @@
     .about-cards{grid-template-columns:1fr}
   }
   @media print{.about-modal{display:none}}
+
+  /* motion */
+  .btn{transition:background .18s ease,color .18s ease,border-color .18s ease,transform .18s ease,box-shadow .18s ease}
+  .btn:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(20,24,27,.12)}
+  .btn:active{transform:translateY(0);box-shadow:0 2px 8px rgba(20,24,27,.10)}
+  .btn.ghost:hover{box-shadow:none}
+  nav a{transition:border-color .18s ease,color .18s ease}
+  .case{transition:transform .24s ease,box-shadow .24s ease}
+  .case:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(20,24,27,.08)}
+  .about-modal{opacity:0;pointer-events:none;transition:opacity .24s ease}
+  .about-modal.is-open{opacity:1;pointer-events:auto}
+  .about-panel{transform:translateY(14px) scale(.985);transition:transform .3s cubic-bezier(.2,.7,.2,1)}
+  .about-modal.is-open .about-panel{transform:none}
 </style>
 </head>
 <body>
@@ -1057,6 +1070,10 @@
   .cookie button{flex:none;padding:9px 16px;border:1px solid var(--ink);background:var(--ink);color:var(--paper);
     font:inherit;font-size:14px;border-radius:var(--radius);cursor:pointer}
   .cookie button:hover{background:var(--accent);border-color:var(--accent)}
+  .cookie{opacity:0;transform:translateY(10px);transition:opacity .24s ease,transform .24s ease}
+  .cookie.is-visible{opacity:1;transform:none}
+  .cookie button{transition:background .18s ease,border-color .18s ease,transform .18s ease}
+  .cookie button:hover{transform:translateY(-1px)}
   .cookie[hidden]{display:none}
   @media (min-width:720px){.cookie{left:24px;right:auto}}
   @media print{.cookie{display:none}}
@@ -1076,11 +1093,18 @@ document.addEventListener("click", function(e){
 (function(){
   var note = document.getElementById('cookie-note');
   try{ if(localStorage.getItem('cookie_ok') === '1') return; }catch(e){}
-  if(note) note.hidden = false;
+  if(note){
+    note.hidden = false;
+    requestAnimationFrame(function(){ note.classList.add('is-visible'); });
+  }
   var btn = document.getElementById('cookie-ok');
   if(btn) btn.addEventListener('click', function(){
     try{ localStorage.setItem('cookie_ok', '1'); }catch(e){}
-    if(note) note.hidden = true;
+    if(note){
+      note.classList.remove('is-visible');
+      var delay = (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) ? 0 : 240;
+      setTimeout(function(){ note.hidden = true; }, delay);
+    }
   });
 })();
 </script>
@@ -1114,13 +1138,17 @@ document.addEventListener("click", function(e){
     else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
   }
 
+  var closeTimer = null;
+
   function open(e){
     if(e){ e.preventDefault(); }
+    if(closeTimer){ clearTimeout(closeTimer); closeTimer = null; }
     lastFocus = document.activeElement;
     var gap = window.innerWidth - document.documentElement.clientWidth;
     savedPadding = document.body.style.paddingRight;
     if(gap > 0){ document.body.style.paddingRight = gap + "px"; }
     modal.hidden = false;
+    requestAnimationFrame(function(){ modal.classList.add("is-open"); });
     document.body.style.overflow = "hidden";
     if(panel){ panel.scrollTop = 0; }
     if(closeBtn){ closeBtn.focus(); }
@@ -1128,14 +1156,25 @@ document.addEventListener("click", function(e){
     if(typeof window.ym === "function"){ window.ym(114127728, "reachGoal", "about_open"); }
   }
 
-  function close(){
+  function finishClose(){
+    closeTimer = null;
     modal.hidden = true;
+    modal.classList.remove("is-open");
     document.body.style.overflow = "";
     document.body.style.paddingRight = savedPadding;
     document.removeEventListener("keydown", onKey);
     if(lastFocus && typeof lastFocus.focus === "function"){
       try{ lastFocus.focus({preventScroll:true}); }catch(err){ lastFocus.focus(); }
     }
+  }
+
+  function close(){
+    if(modal.hidden || closeTimer) return;
+    modal.classList.remove("is-open");
+    document.removeEventListener("keydown", onKey);
+    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if(reduce){ finishClose(); return; }
+    closeTimer = setTimeout(finishClose, 260);
   }
 
   Array.prototype.forEach.call(openers, function(el){
