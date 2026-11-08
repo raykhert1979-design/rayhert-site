@@ -319,9 +319,35 @@
     }
     section:has(.sec-head):nth-of-type(even)::after{right:auto;left:clamp(0px,1vw,14px)}
   }
+
+  /* scene backdrop v2: continuous scroll blend */
+  .scene-bg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+  .scene{position:absolute;inset:-5%;opacity:0;will-change:opacity}
+  .scene img{width:100%;height:100%;object-fit:cover;display:block;transform:translate3d(0,calc(var(--p,0) * -60px * var(--speed,1)),0) scale(1.06);filter:blur(1.4px) saturate(.84) contrast(1.05) sepia(.06);will-change:transform}
+  .scene[data-scene="datacenter"]{--speed:.55;opacity:calc(var(--w-datacenter,0) * .13)}
+  .scene[data-scene="datacenter"] img{filter:blur(1.4px) brightness(.62) contrast(1.12) saturate(.78) sepia(.03)}
+  .scene[data-scene="coffee"]{--speed:.8;opacity:calc(var(--w-coffee,0) * .12)}
+  .scene[data-scene="film"]{--speed:.7;opacity:calc(var(--w-film,0) * .13)}
+  .scene[data-scene="banknote"]{--speed:1;opacity:calc(var(--w-banknote,0) * .10)}
+  .scene[data-scene="film"] img{filter:blur(1.2px) brightness(.58) contrast(1.22) saturate(.80) sepia(.04)}
+  .scene[data-scene="banknote"] img{filter:blur(4px) saturate(.78) contrast(.95) brightness(.98) sepia(.06)}
+  .scene-bg::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
+    background:linear-gradient(180deg,rgba(243,241,236,.94) 0%,rgba(243,241,236,0) 11%,rgba(243,241,236,0) 89%,rgba(243,241,236,.94) 100%)}
+  header,footer{position:relative;z-index:2}
+  @media (max-width:900px){.scene-bg{display:none}}
+  @media (prefers-reduced-motion:reduce){.scene img{transform:none}}
+
 </style>
 </head>
 <body>
+
+<div class="scene-bg" aria-hidden="true">
+  <div class="scene" data-scene="banknote"><img src="scene-banknote-16x9.jpg" alt="" decoding="async"></div>
+  <div class="scene" data-scene="datacenter"><img src="scene-datacenter-16x9.jpg" alt="" decoding="async"></div>
+  <div class="scene" data-scene="coffee"><img src="scene-coffee5-16x9.jpg" alt="" decoding="async"></div>
+  <div class="scene" data-scene="film"><img src="scene-film-16x9.jpg" alt="" decoding="async"></div>
+</div>
+
 
 <header>
   <div class="wrap bar">
@@ -1222,6 +1248,68 @@ document.addEventListener("click", function(e){
       close();
     });
   });
+})();
+</script>
+
+
+<script>
+(() => {
+  const hero = document.querySelector(".hero");
+  const stops = [
+    [hero, "datacenter"],
+    [document.getElementById("who"), "coffee"],
+    [document.getElementById("services"), "banknote"],
+    [document.getElementById("how"), "film"],
+    [document.getElementById("cases"), "banknote"],
+    [document.getElementById("calc"), "banknote"],
+    [document.getElementById("faq"), "banknote"],
+    [document.getElementById("contact"), "banknote"]
+  ];
+  const names = ["datacenter", "coffee", "film", "banknote"];
+  const body = document.body;
+  let centers = [];
+  function measure() {
+    centers = stops.map(([el, scene]) => {
+      const r = el.getBoundingClientRect();
+      return {y: r.top + window.scrollY + r.height / 2, scene};
+    });
+  }
+  function smooth(t) { return t * t * (3 - 2 * t); }
+  function update() {
+    const pos = window.scrollY + window.innerHeight * 0.30;
+    const w = {datacenter: 0, coffee: 0, film: 0, banknote: 0};
+    if (!centers.length) return;
+    if (pos <= centers[0].y) {
+      w[centers[0].scene] = 1;
+    } else if (pos >= centers[centers.length - 1].y) {
+      w[centers[centers.length - 1].scene] = 1;
+    } else {
+      for (let i = 0; i < centers.length - 1; i++) {
+        const a = centers[i], b = centers[i + 1];
+        if (pos >= a.y && pos <= b.y) {
+          const t = smooth((pos - a.y) / (b.y - a.y || 1));
+          w[a.scene] += 1 - t;
+          w[b.scene] += t;
+          break;
+        }
+      }
+    }
+    for (const n of names) body.style.setProperty("--w-" + n, w[n].toFixed(4));
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    body.style.setProperty("--p", max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)).toFixed(4) : "0");
+  }
+  let ticking = false;
+  function onScroll() {
+    if (!ticking) {
+      ticking = true;
+      requestAnimationFrame(() => { ticking = false; update(); });
+    }
+  }
+  window.addEventListener("scroll", onScroll, {passive: true});
+  window.addEventListener("resize", () => { measure(); onScroll(); });
+  window.addEventListener("load", () => { measure(); update(); });
+  measure();
+  update();
 })();
 </script>
 
