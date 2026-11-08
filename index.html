@@ -237,7 +237,13 @@
   .review-meta{margin-top:12px;font-size:12px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase}
   .review-badge{display:inline-block;margin-top:12px;font-size:11px;letter-spacing:.09em;text-transform:uppercase;
     color:#8a5a12;border:1px solid var(--brass);background:#fbf3e4;border-radius:2px;padding:3px 9px}
-  .reviews-empty{grid-column:1/-1;background:var(--paper);border:1px dashed var(--line);margin:0;padding:24px 26px;color:var(--muted);font-size:15.5px}
+  .reviews-proof{grid-column:1/-1;background:var(--paper);border:1px dashed var(--line);margin:0;padding:24px 26px;color:var(--ink-soft);font-size:15.5px}
+  .reviews-proof[hidden]{display:none}
+  .reviews-proof b{display:block;font-family:Georgia,serif;font-weight:400;font-size:20px;margin-bottom:8px;color:var(--ink)}
+  .reviews-proof p{margin:0 0 10px}
+  .reviews-proof ul{margin:0 0 10px;padding-left:18px}
+  .reviews-proof li{margin-bottom:6px}
+  .reviews-proof a{color:var(--accent)}
   .review-form{margin-top:26px;background:#faf8f3;border:1px solid var(--line);padding:clamp(20px,3vw,34px)}
   .review-form h3{font-size:23px;margin:0 0 16px}
   .review-form .row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
@@ -321,9 +327,9 @@
       <a href="#who">Кому помогаем</a>
       <a href="#services">Услуги</a>
       <a href="#cases">Работы</a>
-      <a href="#reviews">Отзывы</a>
       <a href="#calc">Смета</a>
       <a href="#how">Как работаем</a>
+      <a href="#reviews">Отзывы</a>
       <a href="#contact">Контакты</a>
     </nav>
   </div>
@@ -516,60 +522,9 @@
     </div>
   </section>
 
-  <section id="reviews">
-    <div class="wrap">
-      <div class="sec-head"><span class="num">05</span><h2>Отзывы</h2></div>
-      <p class="sec-note">Публикуем отзывы после проверки. Пишите как есть — и хорошее, и то, что стоит поправить.</p>
-
-      <div class="reviews" id="reviews-list">
-        <!-- ШАБЛОН ДЛЯ ПУБЛИКАЦИИ ПОСЛЕ МОДЕРАЦИИ. Удалите блок «Пока отзывов нет», когда выйдет первый отзыв.
-        <article class="review">
-          <div class="review-top"><b>Имя</b><span class="review-stars">★★★★★</span></div>
-          <p>Текст отзыва.</p>
-          <div class="review-meta">Проект · 08.11.2026</div>
-        </article>
-        -->
-        <p class="reviews-empty" id="reviews-empty">Пока отзывов нет — станьте первым.</p>
-      </div>
-
-      <form class="review-form" id="review-form" novalidate>
-        <h3>Оставить отзыв</h3>
-        <div class="row">
-          <div class="field">
-            <label for="rv-name">Как вас зовут</label>
-            <input id="rv-name" name="name" type="text" autocomplete="name" required placeholder="Имя">
-          </div>
-          <div class="field">
-            <label for="rv-rating">Оценка</label>
-            <select id="rv-rating" name="rating">
-              <option value="5" selected>5 — отлично</option>
-              <option value="4">4 — хорошо</option>
-              <option value="3">3 — нормально</option>
-              <option value="2">2 — так себе</option>
-              <option value="1">1 — плохо</option>
-            </select>
-          </div>
-        </div>
-        <div class="field">
-          <label for="rv-text">Отзыв</label>
-          <textarea id="rv-text" name="comment" rows="4" required placeholder="Что сделали, что получилось, что можно улучшить"></textarea>
-        </div>
-        <label class="consent">
-          <input type="checkbox" id="rv-consent">
-          <span>Согласен на обработку данных и публикацию отзыва после проверки — по <a href="privacy.html">политике конфиденциальности</a></span>
-        </label>
-        <input id="rv-gotcha" name="_gotcha" type="text" tabindex="-1" autocomplete="off" aria-label="Поле проверки на роботов, не заполняйте" style="display:none">
-        <div class="actions">
-          <button class="btn" type="submit" id="rv-submit">Отправить на модерацию</button>
-        </div>
-        <p class="review-status" id="rv-status" role="status" aria-live="polite"></p>
-      </form>
-    </div>
-  </section>
-
   <section id="calc">
     <div class="wrap">
-      <div class="sec-head"><span class="num">06</span><h2>Смета за минуту</h2></div>
+      <div class="sec-head"><span class="num">05</span><h2>Смета за минуту</h2></div>
       <p class="sec-note">Выберите задачу и объём — увидите вилку и срок. Это ориентир, а не счёт: точную сумму назовём после короткого разговора.</p>
 
       <form class="calc" id="calc-form" novalidate>
@@ -609,7 +564,7 @@
   </section>
   <section id="faq">
     <div class="wrap">
-      <div class="sec-head"><span class="num">07</span><h2>Частые вопросы</h2></div>
+      <div class="sec-head"><span class="num">06</span><h2>Частые вопросы</h2></div>
 
       <details>
         <summary>Сколько времени занимает задача?</summary>
@@ -642,6 +597,67 @@
       </details>
     </div>
   </section>
+  <section id="reviews">
+    <div class="wrap">
+      <div class="sec-head"><span class="num">07</span><h2>Отзывы</h2></div>
+      <p class="sec-note">Публикуем только настоящие отзывы — после проверки. Выдуманных здесь не будет: лучше пусто, чем неправда.</p>
+
+      <div class="reviews" id="reviews-list">
+        <!-- ШАБЛОН ДЛЯ ПУБЛИКАЦИИ ПОСЛЕ МОДЕРАЦИИ. Удалите блок «Пока отзывов нет», когда выйдет первый отзыв.
+        <article class="review">
+          <div class="review-top"><b>Имя</b><span class="review-stars">★★★★★</span></div>
+          <p>Текст отзыва.</p>
+          <div class="review-meta">Проект · 08.11.2026</div>
+        </article>
+        -->
+        <div class="reviews-proof" id="reviews-empty">
+          <b>Первые отзывы появятся после проектов</b>
+          <p>Пока их нет — вот что можно проверить прямо сейчас, без обещаний:</p>
+          <ul>
+            <li><a href="#cases">Пять работающих проектов</a> — каналы, сообщество, YouTube, приложение.</li>
+            <li>142 обновления приложения в RuStore и рейтинг 4,9.</li>
+            <li>113 900 подписчиков на каналах «Митрофановна».</li>
+            <li>Восемь площадок, которые ведём одновременно.</li>
+          </ul>
+          <p>Хотите оставить первый отзыв о работе студии — форма ниже.</p>
+        </div>
+      </div>
+
+      <form class="review-form" id="review-form" novalidate>
+        <h3>Оставить отзыв</h3>
+        <div class="row">
+          <div class="field">
+            <label for="rv-name">Как вас зовут</label>
+            <input id="rv-name" name="name" type="text" autocomplete="name" required placeholder="Имя">
+          </div>
+          <div class="field">
+            <label for="rv-rating">Оценка</label>
+            <select id="rv-rating" name="rating">
+              <option value="5" selected>5 — отлично</option>
+              <option value="4">4 — хорошо</option>
+              <option value="3">3 — нормально</option>
+              <option value="2">2 — так себе</option>
+              <option value="1">1 — плохо</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="rv-text">Отзыв</label>
+          <textarea id="rv-text" name="comment" rows="4" required placeholder="Что сделали, что получилось, что можно улучшить"></textarea>
+        </div>
+        <label class="consent">
+          <input type="checkbox" id="rv-consent">
+          <span>Согласен на обработку данных и публикацию отзыва после проверки — по <a href="privacy.html">политике конфиденциальности</a></span>
+        </label>
+        <input id="rv-gotcha" name="_gotcha" type="text" tabindex="-1" autocomplete="off" aria-label="Поле проверки на роботов, не заполняйте" style="display:none">
+        <div class="actions">
+          <button class="btn" type="submit" id="rv-submit">Отправить на модерацию</button>
+        </div>
+        <p class="review-status" id="rv-status" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+  </section>
+
   <section class="contact" id="contact">
     <div class="wrap contact-grid">
       <div>
