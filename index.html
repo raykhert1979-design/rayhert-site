@@ -225,13 +225,60 @@
     .out{grid-template-columns:1fr}
     .contact-grid{grid-template-columns:1fr}
   }
+
+  /* about modal */
+  .hero-note{margin:18px 0 0}
+  .linklike{background:none;border:0;padding:0 0 2px;font:inherit;font-size:15.5px;color:var(--accent);cursor:pointer;border-bottom:1px solid var(--brass)}
+  .linklike:hover{color:var(--ink)}
+  .about-modal{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:clamp(0px,3vw,36px)}
+  .about-modal[hidden]{display:none}
+  .about-backdrop{position:absolute;inset:0;background:rgba(20,24,27,.62)}
+  .about-panel{position:relative;width:100%;max-width:840px;max-height:min(92vh,980px);overflow:auto;overscroll-behavior:contain;
+    background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 30px 90px rgba(20,24,27,.38)}
+  .about-bar{position:sticky;top:0;z-index:2;display:flex;justify-content:flex-end;padding:10px 10px 0;
+    background:linear-gradient(180deg,var(--paper) 62%,rgba(243,241,236,0))}
+  .about-close{width:40px;height:40px;display:grid;place-items:center;border:1px solid var(--line);background:var(--paper);
+    color:var(--ink);font:400 24px/1 "Segoe UI",system-ui,sans-serif;border-radius:var(--radius);cursor:pointer}
+  .about-close:hover{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+  .about-body{padding:clamp(6px,1vw,14px) clamp(20px,4vw,48px) clamp(26px,4vw,48px)}
+  .about-title{font-size:clamp(36px,6vw,54px);line-height:1.02;margin:0 0 10px}
+  .about-h3{font-family:Georgia,"Times New Roman",serif;font-weight:400;font-size:clamp(21px,2.6vw,26px);line-height:1.2;
+    margin:38px 0 14px;padding-top:26px;border-top:1px solid var(--line)}
+  .about-body p{margin:0 0 14px;color:var(--ink-soft);font-size:16px;line-height:1.6}
+  .about-body .about-kicker{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin:0 0 10px}
+  .about-body .about-sub{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 24px}
+  .about-body .about-lead{font-size:clamp(18px,2.2vw,21px);line-height:1.5;color:var(--ink-soft);margin:0 0 10px;max-width:62ch}
+  .about-body .about-note{font-size:13px;color:var(--muted);line-height:1.5}
+  .about-body .about-fine{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px;margin-top:6px}
+  .about-quote{border-left:3px solid var(--brass);padding:2px 0 2px 18px;margin:0 0 16px;font-family:Georgia,serif;
+    font-size:clamp(18px,2.2vw,21px);line-height:1.45;color:var(--ink)}
+  .about-cards{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin:4px 0 6px}
+  .about-card{background:var(--paper);padding:18px 20px}
+  .about-card b{display:block;font-family:Georgia,serif;font-weight:400;font-size:18px;margin-bottom:6px}
+  .about-card span{display:block;font-size:15px;line-height:1.5;color:var(--ink-soft)}
+  .about-stats{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin:4px 0 14px}
+  .about-stat{background:var(--paper);padding:18px 20px}
+  .about-stat b{display:block;font-family:Georgia,serif;font-weight:400;font-size:clamp(24px,3.4vw,32px);line-height:1.1}
+  .about-stat span{display:block;margin-top:6px;font-size:13px;line-height:1.4;color:var(--muted)}
+  .about-rules{margin:0;padding:0;list-style:none;counter-reset:ar}
+  .about-rules li{position:relative;padding:0 0 16px 44px;counter-increment:ar;color:var(--ink-soft);font-size:16px;line-height:1.55}
+  .about-rules li::before{content:counter(ar);position:absolute;left:0;top:1px;width:28px;height:28px;display:grid;place-items:center;
+    border:1px solid var(--ink);border-radius:50%;font-family:Georgia,serif;font-size:13px;color:var(--ink)}
+  .about-rules b{color:var(--ink);font-weight:600}
+  .about-actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:6px 0 18px}
+  @media (max-width:700px){
+    .about-modal{padding:0}
+    .about-panel{max-height:100dvh;height:100dvh;border:0;border-radius:0}
+    .about-cards{grid-template-columns:1fr}
+  }
+  @media print{.about-modal{display:none}}
 </style>
 </head>
 <body>
 
 <header>
   <div class="wrap bar">
-    <a class="brand" href="#top" aria-label="Студия Артёма Райхерта — на главную">
+    <a class="brand" href="#top" id="brand-about" data-about-open aria-haspopup="dialog" aria-controls="about-modal" aria-label="Артём Райхерт — студия каналов и продуктов. Открыть рассказ о студии">
       <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true">
         <rect x="1" y="1" width="32" height="32" fill="none" stroke="#14181b"/>
         <text x="17" y="22" text-anchor="middle" font-family="Georgia,serif" font-size="13" fill="#1f6f5c">АР</text>
@@ -260,6 +307,7 @@
       <a class="btn" href="#calc">Собрать смету за минуту</a>
       <a class="btn ghost" href="#cases">Посмотреть работы</a>
     </div>
+    <p class="hero-note"><button class="linklike" type="button" data-about-open aria-haspopup="dialog" aria-controls="about-modal">Кто стоит за студией →</button></p>
   </div>
 
   <div class="wrap">
@@ -607,6 +655,68 @@
     <span>Смета считается у вас в браузере. Заявка отправляется только с вашего согласия — <a href="privacy.html">политика конфиденциальности</a>.</span>
   </div>
 </footer>
+
+<div class="about-modal" id="about-modal" role="dialog" aria-modal="true" aria-labelledby="about-title" aria-describedby="about-lead" hidden>
+  <div class="about-backdrop" data-about-close></div>
+  <div class="about-panel" role="document">
+    <div class="about-bar">
+      <button class="about-close" type="button" data-about-close aria-label="Закрыть рассказ">×</button>
+    </div>
+    <article class="about-body">
+      <p class="about-kicker">Кто стоит за студией</p>
+      <h2 class="about-title" id="about-title">Артём Райхерт</h2>
+      <p class="about-sub">Студия каналов и продуктов · Челябинск, работаем по всей России</p>
+      <p class="about-lead" id="about-lead">Я собираю каналы, приложения и документы так, чтобы они работали без вашего ежедневного участия. Вы занимаетесь своим делом — контент выходит по расписанию, отчёты приходят сами, заявки не теряются.</p>
+
+      <h3 class="about-h3">Сцена научила не врать</h3>
+      <p>Моя дорога началась со сцены и эфира: я вёл программу «В гостях у Митрофановны», работал с ансамблем «Митрофановна» — коллективом, который живёт на сцене больше 35 лет. Там быстро понимаешь: зритель чувствует фальшь за секунду.</p>
+      <p>С тех пор правило одно — показывать то, что можно открыть и проверить. Поэтому на этом сайте нет «портфолио для красоты»: каналы, сообщество и приложение открываются в один клик.</p>
+
+      <div class="about-quote">От Дома культуры в Кременкуле до RuStore и восьми площадок — путь один: делать то, что видно.</div>
+
+      <h3 class="about-h3">Что я делаю сегодня</h3>
+      <p>Пока вы читаете этот текст, на каналах по расписанию выходят посты, приложение обновляется, отчёты собираются сами. Так и должно быть: рутина работает без вас.</p>
+      <div class="about-cards">
+        <div class="about-card"><b>Каналы и сообщества</b><span>Дзен, VK, ОК, Rutube, YouTube, Telegram: контент-план, тексты, обложки, публикации по слотам, ответы на комментарии.</span></div>
+        <div class="about-card"><b>Android-приложения</b><span>Полный цикл в RuStore: сборка, подпись, карточка, скриншоты, релизы, ответы на отзывы. «Деревенский шансон» — 142 обновления.</span></div>
+        <div class="about-card"><b>Автоматизация</b><span>Конвейер публикаций на восьми площадках с проверкой, что материал действительно вышел; сбор неотвеченных комментариев; отчёты по расписанию.</span></div>
+        <div class="about-card"><b>Документы и аналитика</b><span>Презентации, регламенты, дашборды, разбор выгрузок из 1С с проверкой сходимости итогов.</span></div>
+      </div>
+
+      <h3 class="about-h3">Цифры, которые не надо принимать на веру</h3>
+      <div class="about-stats">
+        <div class="about-stat"><b>142</b><span>обновления приложения «Деревенский шансон» в RuStore</span></div>
+        <div class="about-stat"><b>113 900</b><span>подписчиков на каналах «Митрофановна» в Дзене и на YouTube</span></div>
+        <div class="about-stat"><b>11,4 млн</b><span>просмотров на YouTube-канале ансамбля</span></div>
+        <div class="about-stat"><b>8</b><span>площадок, которые ведём одновременно</span></div>
+      </div>
+      <p class="about-note">Все цифры — из открытых кабинетов площадок и магазина приложений. Проверяются в два клика.</p>
+
+      <h3 class="about-h3">Пять правил, по которым я работаю</h3>
+      <ol class="about-rules">
+        <li><b>Сначала смета — потом работа.</b> Один рабочий день, бесплатно. Пока не увидите цифры и срок, вы ничего не платите.</li>
+        <li><b>Один договор, один срок, одна ответственность.</b> Не нужно сводить пятерых подрядчиков и слушать, кто кого ждёт.</li>
+        <li><b>Никаких накруток.</b> Подписчики, лайки и просмотры — только живые: накрутка ломает охваты и сжигает бюджет.</li>
+        <li><b>Проверяем в кабинете, а не в отчёте на словах.</b> Метрика, студия площадки, RuStore — первоисточники, а не пересказ.</li>
+        <li><b>Начинаем с малого.</b> Один документ, один пост, аудит. Понравится — продолжим; не понравится — скажете об этом раньше, чем потратите много.</li>
+      </ol>
+
+      <h3 class="about-h3">Четыре фразы, в которых весь подход</h3>
+      <div class="about-quote">Вы платите не за посты. Вы платите за то, что контент выходит без вас.</div>
+      <div class="about-quote">Ритм важнее вспышек: один пост в неделю не спасает, тридцать в месяц — меняют картину.</div>
+      <div class="about-quote">Хороший подрядчик — не тот, кто много обещает, а тот, кого не нужно проверять.</div>
+      <div class="about-quote">Волшебной кнопки нет. Есть расписание, дисциплина и цифры — их и приносим.</div>
+
+      <h3 class="about-h3">Давайте проверим на вашей задаче</h3>
+      <p>Пришлите задачу в двух-трёх предложениях — верну смету, состав работ и срок в течение рабочего дня. Если задача не наша, скажу прямо и не буду тянуть время.</p>
+      <div class="about-actions">
+        <a class="btn" href="#calc" data-about-close>Собрать смету</a>
+        <a class="btn ghost" href="https://max.ru/u/f9LHodD0cOKq8C190KRZ4gdDqU-Fp4NatlXMMmQAcoZiNHJgE_a67Rk0uXs" rel="noopener">Написать в MAX</a>
+      </div>
+      <p class="about-fine">Самозанятый, НПД. Договор и закрывающие документы — по запросу. Удалённо по всей России.</p>
+    </article>
+  </div>
+</div>
 
 <script>
 (function(){
@@ -963,6 +1073,73 @@ document.addEventListener("click", function(e){
   if(btn) btn.addEventListener('click', function(){
     try{ localStorage.setItem('cookie_ok', '1'); }catch(e){}
     if(note) note.hidden = true;
+  });
+})();
+</script>
+<script>
+(function(){
+  "use strict";
+  var modal = document.getElementById("about-modal");
+  if(!modal) return;
+
+  var panel = modal.querySelector(".about-panel");
+  var closeBtn = modal.querySelector(".about-close");
+  var openers = document.querySelectorAll("[data-about-open]");
+  var closers = modal.querySelectorAll("[data-about-close]");
+  var lastFocus = null;
+  var savedPadding = "";
+
+  function focusables(){
+    return Array.prototype.filter.call(
+      modal.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'),
+      function(el){ return el.offsetWidth > 0 || el.offsetHeight > 0; }
+    );
+  }
+
+  function onKey(e){
+    if(e.key === "Escape"){ e.preventDefault(); close(); return; }
+    if(e.key !== "Tab") return;
+    var list = focusables();
+    if(!list.length) return;
+    var first = list[0], last = list[list.length - 1];
+    if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+    else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+  }
+
+  function open(e){
+    if(e){ e.preventDefault(); }
+    lastFocus = document.activeElement;
+    var gap = window.innerWidth - document.documentElement.clientWidth;
+    savedPadding = document.body.style.paddingRight;
+    if(gap > 0){ document.body.style.paddingRight = gap + "px"; }
+    modal.hidden = false;
+    document.body.style.overflow = "hidden";
+    if(panel){ panel.scrollTop = 0; }
+    if(closeBtn){ closeBtn.focus(); }
+    document.addEventListener("keydown", onKey);
+    if(typeof window.ym === "function"){ window.ym(114127728, "reachGoal", "about_open"); }
+  }
+
+  function close(){
+    modal.hidden = true;
+    document.body.style.overflow = "";
+    document.body.style.paddingRight = savedPadding;
+    document.removeEventListener("keydown", onKey);
+    if(lastFocus && typeof lastFocus.focus === "function"){
+      try{ lastFocus.focus({preventScroll:true}); }catch(err){ lastFocus.focus(); }
+    }
+  }
+
+  Array.prototype.forEach.call(openers, function(el){
+    el.addEventListener("click", open);
+  });
+
+  Array.prototype.forEach.call(closers, function(el){
+    el.addEventListener("click", function(e){
+      if(el.tagName === "A" && el.getAttribute("href")){ close(); return; }
+      e.preventDefault();
+      close();
+    });
   });
 })();
 </script>
