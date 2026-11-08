@@ -929,5 +929,34 @@
   });
 })();
 </script>
+<style>
+  .cookie{position:fixed;left:16px;right:16px;bottom:16px;z-index:60;max-width:520px;
+    background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+    padding:14px 16px;box-shadow:0 8px 28px rgba(20,24,27,.10);font-size:14px;line-height:1.45;
+    color:var(--ink-soft);display:flex;gap:14px;align-items:center;flex-wrap:wrap;justify-content:space-between}
+  .cookie p{margin:0;max-width:330px}
+  .cookie a{color:var(--accent)}
+  .cookie button{flex:none;padding:9px 16px;border:1px solid var(--ink);background:var(--ink);color:var(--paper);
+    font:inherit;font-size:14px;border-radius:var(--radius);cursor:pointer}
+  .cookie button:hover{background:var(--accent);border-color:var(--accent)}
+  @media (min-width:720px){.cookie{left:24px;right:auto}}
+  @media print{.cookie{display:none}}
+</style>
+<div class="cookie" id="cookie-note" hidden role="region" aria-label="Уведомление о cookie">
+  <p>Сайт использует cookie для статистики. <a href="privacy.html">Подробнее</a></p>
+  <button type="button" id="cookie-ok">Понятно</button>
+</div>
+<script>
+(function(){
+  var note = document.getElementById('cookie-note');
+  try{ if(localStorage.getItem('cookie_ok') === '1') return; }catch(e){}
+  if(note) note.hidden = false;
+  var btn = document.getElementById('cookie-ok');
+  if(btn) btn.addEventListener('click', function(){
+    try{ localStorage.setItem('cookie_ok', '1'); }catch(e){}
+    if(note) note.hidden = true;
+  });
+})();
+</script>
 </body>
 </html>
