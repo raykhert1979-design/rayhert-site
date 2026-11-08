@@ -26,6 +26,7 @@ import os
 import re
 import ssl
 import sys
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -200,6 +201,32 @@ def send_to_max(text: str) -> bool:
         return False
 
 
+def connect_box(login: str, password: str, attempts: int = 3):
+    """Подключается к IMAP и открывает INBOX, повторяя попытку при обрыве."""
+    last_error = None
+    box = None
+    for attempt in range(1, attempts + 1):
+        try:
+            box = imaplib.IMAP4_SSL(IMAP_HOST)
+            box.login(login, password)
+            typ, _ = box.select("INBOX")
+            if typ != "OK":
+                raise imaplib.IMAP4.error(f"SELECT INBOX: {typ}")
+            return box
+        except Exception as exc:  # noqa: BLE001
+            last_error = exc
+            print(f"IMAP: попытка {attempt}/{attempts} не удалась — {exc}")
+            if box is not None:
+                try:
+                    box.logout()
+                except Exception:  # noqa: BLE001
+                    pass
+                box = None
+            if attempt < attempts:
+                time.sleep(2 * attempt)
+    raise last_error
+
+
 def main() -> int:
     login = env("YANDEX_LOGIN")
     password = env("YANDEX_APP_PASSWORD")
@@ -213,7 +240,7 @@ def main() -> int:
         return 0
 
     try:
-        box = imaplib.IMAP4_SSL(IMAP_HOST)
+        box = connect_box(login, password)
     except Exception as exc:  # noqa: BLE001
         print(f"IMAP: не удалось подключиться — {exc}")
         return 1
@@ -221,12 +248,15 @@ def main() -> int:
     sent = 0
     failed = 0
     try:
-        box.login(login, password)
-        box.select("INBOX")
-
         since = (datetime.date.today() - datetime.timedelta(days=IMAP_LOOKBACK_DAYS)).strftime("%d-%b-%Y")
         archived = message_ids(box, ARCHIVE_FOLDER_UTF7, quoted=True)
-        box.select("INBOX")
+        try:
+            typ, _ = box.select("INBOX")
+            if typ != "OK":
+                raise imaplib.IMAP4.error(f"SELECT INBOX: {typ}")
+        except Exception as exc:  # noqa: BLE001
+            print(f"IMAP: не удалось вернуться во Входящие — {exc}")
+            box = connect_box(login, password)
         typ, data = box.search(None, f'(SENTSINCE {since})')
         if typ != "OK":
             print("IMAP: поиск писем не удался")
