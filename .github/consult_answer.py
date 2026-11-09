@@ -8,7 +8,7 @@ def ctx_no_verify():
     return c
 
 giga_secret = os.environ["GIGA_SECRET"]
-max_token = os.environ["MAX_TOKEN"]
+max_token = os.environ["CONSULT_MAX_TOKEN"]
 chat_id = os.environ["CHAT_ID"]
 text = os.environ["TEXT"]
 
