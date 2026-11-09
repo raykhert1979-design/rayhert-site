@@ -7,7 +7,7 @@ on:
         description: Текст сообщения клиента
         required: true
       chat_id:
-        description: ID чата MAX для ответа
+        description: ID чата MAX
         required: true
       sender_name:
         description: Имя отправителя
@@ -18,55 +18,12 @@ jobs:
   answer:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: GigaChat answer to MAX
         env:
           GIGA_SECRET: ${{ secrets.GIGA_SECRET }}
           MAX_TOKEN: ${{ secrets.MAX_TOKEN }}
-          MAX_CHAT: ${{ secrets.MAX_CHAT_ID }}
           TEXT: ${{ github.event.inputs.text }}
           CHAT_ID: ${{ github.event.inputs.chat_id }}
-          SENDER: ${{ github.event.inputs.sender_name }}
-        run: |
-          python3 - <<'PY'
-import os, json, urllib.request, urllib.parse, uuid, ssl
-def ctx_no_verify():
-    c = ssl.create_default_context()
-    c.check_hostname = False
-    c.verify_mode = ssl.CERT_NONE
-    return c
-giga_secret = os.environ['GIGA_SECRET']
-max_token = os.environ['MAX_TOKEN']
-max_chat = os.environ['MAX_CHAT']
-text = os.environ['TEXT']
-chat_id = os.environ['CHAT_ID']
-kb = ('СТУДИЯ АРТЁМА РАЙХЕРТА: автоматизация каналов и продуктов. '
-      'Ведение каналов 10-25 тыс/мес за площадку, связка 8 площадок 50-90 тыс/мес. '
-      'Аудит 8-15 тыс, стратегия 30-60 тыс, с сопровождением 90-150 тыс. '
-      'Автоматизация: конвейер публикаций, комментарии, отчёты; сценарий от 10 тыс, конвейер 15-40 тыс, поддержка 5-12 тыс/мес. '
-      'Сайты: лендинг 60-120 тыс, корпоративный 150-500 тыс, каталог от 500 тыс, веб-сервис от 800 тыс. '
-      'Документы, презентации, аналитика. Android/RuStore: простое 2-4 недели, MVP от 1,5 мес. '
-      'Сроки: презентация 2-5 дней, ведение старт 3-5 дней, автоматизация 1-3 недели. '
-      'Кейсы: радио Деревенский шансон RuStore, Дзен Митрофановна 58k, YouTube 55.9k. '
-      'Говори от мы, коротко, тепло, по делу. Цены - вилки из базы. Предлагай бесплатный аудит. Не выдумывай цены.')
-data = urllib.parse.urlencode({'scope': 'GIGACHAT_API_PERS'}).encode()
-req = urllib.request.Request('https://ngw.devices.sberbank.ru:9443/api/v2/oauth', data=data, method='POST',
-    headers={'Authorization': 'Basic ' + giga_secret, 'Content-Type': 'application/x-www-form-urlencoded',
-             'Accept': 'application/json', 'RqUID': str(uuid.uuid4()), 'User-Agent': 'rayhert-consult/1.0'})
-with urllib.request.urlopen(req, timeout=60, context=ctx_no_verify()) as r:
-    tok = json.loads(r.read().decode())['access_token']
-payload = {'model': 'GigaChat-2-Max', 'messages': [
-    {'role': 'system', 'content': 'Ты - консультант студии Артёма Райхерта. Отвечай по-русски, живо, от мы, кратко. База:
-' + kb},
-    {'role': 'user', 'content': text}], 'temperature': 0.6, 'max_tokens': 600}
-req2 = urllib.request.Request('https://gigachat.devices.sberbank.ru/api/v1/chat/completions',
-    data=json.dumps(payload).encode(), method='POST',
-    headers={'Authorization': 'Bearer ' + tok, 'Content-Type': 'application/json', 'Accept': 'application/json'})
-with urllib.request.urlopen(req2, timeout=90, context=ctx_no_verify()) as r:
-    answer = json.loads(r.read().decode())['choices'][0]['message']['content'].strip()
-url3 = 'https://platform-api.max.ru/messages?chat_id=' + urllib.parse.quote(str(chat_id))
-req3 = urllib.request.Request(url3, data=json.dumps({'text': answer}).encode(), method='POST',
-    headers={'Authorization': max_token, 'Content-Type': 'application/json'})
-with urllib.request.urlopen(req3, timeout=30, context=ctx_no_verify()) as r:
-    print('MAX send', r.status)
-print('OK')
-PY
+        run: python3 .github/consult_answer.py
