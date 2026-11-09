@@ -36,8 +36,7 @@ def giga_answer(user_text):
     with urllib.request.urlopen(req, timeout=60, context=ctx_no_verify()) as r:
         tok = json.loads(r.read().decode())["access_token"]
     payload = {"model": "GigaChat-2-Max", "messages": [
-        {"role": "system", "content": "Ты — консультант студии Артёма Райхерта. Отвечай по-русски живым языком, от «мы», кратко, тепло, по делу. База знаний:
-" + KB},
+        {"role": "system", "content": "Ты — консультант студии Артёма Райхерта. Отвечай по-русски живым языком, от «мы», кратко, тепло, по делу. База знаний: " + KB},
         {"role": "user", "content": user_text}],
         "temperature": 0.6, "max_tokens": 600}
     req2 = urllib.request.Request("https://gigachat.devices.sberbank.ru/api/v1/chat/completions",
