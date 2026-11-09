@@ -32,9 +32,8 @@ def giga_audit(snapshot_text):
               "рекламы цен. Строго: разбери ТОЛЬКО те цифры и факты, которые есть в снапшоте — подписчики, "
               "активность, просмотры, регулярность публикаций, названия канала. Ничего не выдумывай и не "
               "обобщай сверх данных. Избегай шаблонных комплиментов («отличный канал», «хорошая работа»), "
-              "говори конкретно и честно, но доброжелательно. В конце задай ОДИН живой вопрос по теме "
-              "канала (не «напишите да»), например про цель канала или аудиторию — так мы продолжим "
-              "разговор и предложим, чем помочь.")
+              "говори конкретно и честно, но доброжелательно. НЕ проси вводить «да» и НЕ предлагай "
+              "выбрать опцию — после аудита клиент сам увидит вопрос о сотрудничестве.")
     payload = {"model": "GigaChat-2-Max", "messages": [
         {"role": "system", "content": system},
         {"role": "user", "content": "Снапшот канала:\n" + snapshot_text}],
@@ -55,25 +54,102 @@ def send_max(token, chat_id, text):
     with urllib.request.urlopen(req, timeout=30, context=ctx_no_verify()) as r:
         return r.status
 
+LABELS = {
+    "url": "Канал",
+    "platform": "Площадка",
+    "name": "Название канала",
+    "subscribers": "Подписчики",
+    "members": "Участники",
+    "video_count": "Видео в канале",
+    "video_count_meta": "Видео в канале",
+    "posts_count": "Записей на стене",
+    "page_views_sum": "Просмотры (последняя страница)",
+    "views_sum": "Сумма просмотров",
+    "photos": "Фотографии",
+    "description": "Описание",
+    "summary": "Описание",
+}
+
+def _fmt(v):
+    return str(v).strip()
+
+def build_metrics_rows(data):
+    """Программный блок цифр: строки «показатель — значение — пояснение»."""
+    rows = []
+    plat = _fmt(data.get("platform") or "").lower()
+    rows.append(("Площадка", plat.upper() if plat else "—",
+                 "С этой платформы собран аудит"))
+    for k, label in LABELS.items():
+        if k in ("url", "platform", "description", "summary"):
+            continue
+        v = data.get(k)
+        if v is None or v == "" or v == [] or v == {}:
+            continue
+        val = _fmt(v)
+        if len(val) > 60:
+            val = val[:60] + "…"
+        expl = ""
+        if k in ("subscribers", "members"):
+            expl = "Аудитория, которая подписана на канал"
+        elif k in ("video_count", "video_count_meta", "posts_count"):
+            expl = "Объём контента, который уже на канале"
+        elif k == "page_views_sum":
+            expl = "Просмотры последних видео — реакция аудитории на новый контент"
+        elif k == "views_sum":
+            expl = "Общая сумма просмотров канала"
+        rows.append((label, val, expl))
+    rv = data.get("recent_videos") or []
+    if rv:
+        total = 0
+        for v in rv:
+            try:
+                total += int(v.get("views") or 0)
+            except (TypeError, ValueError):
+                pass
+        if total:
+            rows.append(("Просмотры последних видео", str(total),
+                         "Считаются из списка свежих роликов"))
+        rows.append(("Свежих роликов показано", str(len(rv)),
+                     "Первые из ленты канала"))
+    return rows
+
+def build_table_text(data):
+    """Таблица цифр: показатели и объяснения."""
+    rows = build_metrics_rows(data)
+    if not rows:
+        return "Цифры по каналу не собраны."
+    w1 = max(len(r[0]) for r in rows) + 1
+    w2 = max(len(r[1]) for r in rows) + 1
+    out = []
+    for a, b, c in rows:
+        out.append(f"{a:<{w1}} {b:<{w2}} {c}")
+    return "\n".join(out)
+
 def build_text():
     try:
         with open("snapshot.json", encoding="utf-8") as f:
             data = json.load(f)
-        lines = ["📊 Снапшот канала:"]
-        for k, v in data.items():
-            if v in (None, "", [], {}):
-                continue
-            if isinstance(v, (list, dict)):
-                continue
-            lines.append(f"• {k}: {v}")
+        header = []
+        name = data.get("name") or data.get("title_meta") or data.get("og_title")
+        if name:
+            header.append("Канал: " + str(name)[:80])
+        plat = data.get("platform")
+        if plat:
+            header.append("Площадка: " + str(plat))
+        table = build_table_text(data)
         rv = data.get("recent_videos")
         if rv:
-            lines.append("")
-            lines.append("Последние видео:")
+            header.append("")
+            header.append("Последние видео:")
             for v in rv[:5]:
-                t = (v.get("title") or "")[:50]
-                lines.append(f"  - {t} (просм.: {v.get('views')})")
-        return "\n".join(lines)
+                t = (v.get("title") or "")[:45]
+                header.append(f"  - {t} (просм.: {v.get('views')})")
+        parts = ["📊 Снапшот канала:"]
+        if header:
+            parts.append("\n".join(header))
+        parts.append("\n📈 Цифры по каналу:")
+        parts.append(table)
+        return "\n\n".join(parts)
     except Exception as e:
         return "Не удалось снять снапшот: %s" % e
 
@@ -97,12 +173,16 @@ def main():
     except Exception as e:
         print("GigaChat ERR:", str(e)[:200])
 
+    # Вопрос о дальнейшем сотрудничестве — вместо «напишите да» в прошлом промпте
+    COOP = ("\n\nЕсли хотите, чтобы мы помогли с каналом — ответьте «да», "
+            "и с вами свяжутся наши специалисты: обсудим, что даст автоматизация "
+            "и как получить API канала для более глубокого анализа.")
+
     if audit:
-        to_client = "🎁 Бесплатный аудит канала готов!\n\n" + audit
-        to_owner = to_client + "\n\n---\nСырые данные снапшота:\n" + text
+        to_client = "🎁 Бесплатный аудит канала готов!\n\n" + audit + COOP
+        to_owner = "🎁 Бесплатный аудит канала!\n\n" + audit + "\n\n---\nСырые данные снапшота:\n" + text
     else:
-        to_client = "🎁 Бесплатный аудит канала готов!\n\n" + text + \
-                    "\n\nЭто предварительный разбор. По всем вопросам — напишите, обсудим детали."
+        to_client = "🎁 Бесплатный аудит канала готов!\n\n" + text + COOP
         to_owner = to_client
 
     # 1) клиенту (обязательно)
