@@ -27,13 +27,19 @@ def giga_audit(snapshot_text):
                  "User-Agent": "rayhert-audit/1.0"})
     with urllib.request.urlopen(req, timeout=60, context=ctx_no_verify()) as r:
         tok = json.loads(r.read().decode())["access_token"]
-    system = ("Ты — аналитик студии Артёма Райхерта. По данным снапшота канала составь "
-              "бесплатный аудит за 15 минут. Пиши по-русски, от «мы», тепло, по делу, без воды и без "
-              "рекламы цен. Строго: разбери ТОЛЬКО те цифры и факты, которые есть в снапшоте — подписчики, "
-              "активность, просмотры, регулярность публикаций, названия канала. Ничего не выдумывай и не "
-              "обобщай сверх данных. Избегай шаблонных комплиментов («отличный канал», «хорошая работа»), "
-              "говори конкретно и честно, но доброжелательно. НЕ проси вводить «да» и НЕ предлагай "
-              "выбрать опцию — после аудита клиент сам увидит вопрос о сотрудничестве.")
+    system = ("Ты — аналитик студии Артёма Райхерта. Составь текст бесплатного экспресс-аудита канала "
+              "по данным снапшота. СТРОГО соблюдай структуру макета, без отступлений:\n"
+              "1) Первая строка абзаца: «Мы проанализировали ваш канал \"<название из снапшота>\" на <площадке> "
+              "и готовы поделиться результатами бесплатного экспресс-аудита.»\n"
+              "2) Секция «✅ Что хорошо:» — 2 пункта с «-», только по фактам из снапшота (подписчики, "
+              "объём контента, тематика). Без пустых комплиментов.\n"
+              "3) Секция «❗ Над чем стоит поработать:» — 2 пункта с «-» по слабым местам из данных "
+              "(регулярность публикаций, просмотры, вовлечённость). Конкретно и доброжелательно.\n"
+              "4) Финальный абзац: «Если хотите узнать больше деталей об улучшении показателей своего "
+              "канала, мы можем провести подробный анализ и предложить конкретные рекомендации.»\n"
+              "Правила: только факты из снапшота, ничего не выдумывай, без рекламы цен, без эмодзи-заголовков "
+              "вроде «Что хорошо/Что улучшить» — используй ровно «✅ Что хорошо:» и «❗ Над чем стоит поработать:». "
+              "НЕ рисуй таблицы и НЕ пиши про «да» — таблица и вопрос о сотрудничестве добавляются отдельно.")
     payload = {"model": "GigaChat-2-Max", "messages": [
         {"role": "system", "content": system},
         {"role": "user", "content": "Снапшот канала:\n" + snapshot_text}],
@@ -45,10 +51,13 @@ def giga_audit(snapshot_text):
         d = json.loads(r.read().decode())
         return d["choices"][0]["message"]["content"].strip()
 
-def send_max(token, chat_id, text):
+def send_max(token, chat_id, text, fmt="html"):
+    data = {"text": text}
+    if fmt:
+        data["format"] = fmt
     req = urllib.request.Request(
         "https://platform-api2.max.ru/messages?chat_id=%s" % chat_id,
-        data=json.dumps({"text": text}).encode("utf-8"),
+        data=json.dumps(data).encode("utf-8"),
         headers={"Authorization": token, "Content-Type": "application/json"},
         method="POST")
     with urllib.request.urlopen(req, timeout=30, context=ctx_no_verify()) as r:
@@ -92,7 +101,7 @@ def build_metrics_rows(data):
         if k in ("subscribers", "members"):
             expl = "Аудитория, которая подписана на канал"
         elif k in ("video_count", "video_count_meta", "posts_count"):
-            expl = "Объём контента, который уже на канале"
+            expl = "Объём контента, который уже размещён"
         elif k == "page_views_sum":
             expl = "Просмотры последних видео — реакция аудитории на новый контент"
         elif k == "views_sum":
@@ -114,20 +123,15 @@ def build_metrics_rows(data):
     return rows
 
 def build_table_text(data):
-    """Таблица цифр в рамке: показатели и объяснения."""
+    """Таблица цифр ровными колонками: Показатель | Значение | Пояснение (без рамок)."""
     rows = build_metrics_rows(data)
     if not rows:
         return "Цифры по каналу не собраны."
-    w1 = max(len(r[0]) for r in rows) + 1
-    w2 = max(len(r[1]) for r in rows) + 1
-    w3 = max(len(r[2]) for r in rows)
-    line = "┌" + "─" * (w1 + w2 + w3 + 4) + "┐"
-    out = [line]
+    w1 = max(len(r[0]) for r in rows) + 2
+    w2 = max(len(r[1]) for r in rows) + 2
+    out = []
     for a, b, c in rows:
-        # обрезаем пояснение до ширины
-        c = c[:w3]
-        out.append(f"│ {a:<{w1-1}} {b:<{w2-1}} {c:<{w3}} │")
-    out.append("└" + "─" * (w1 + w2 + w3 + 4) + "┘")
+        out.append(f"{a:<{w1}}{b:<{w2}}{c}")
     return "\n".join(out)
 
 def build_text():
@@ -158,6 +162,30 @@ def build_text():
     except Exception as e:
         return "Не удалось снять снапшот: %s" % e
 
+def build_body_plain():
+    """Короткое описание канала БЕЗ таблицы (для fallback, когда GigaChat не ответил).
+    Таблица добавляется отдельно в main() — ровно один раз."""
+    try:
+        with open("snapshot.json", encoding="utf-8") as f:
+            data = json.load(f)
+        name = data.get("name") or data.get("title_meta") or data.get("og_title")
+        plat = data.get("platform") or ""
+        lines = []
+        if name:
+            lines.append("Канал: " + str(name)[:80])
+        if plat:
+            lines.append("Площадка: " + str(plat))
+        rv = data.get("recent_videos")
+        if rv:
+            lines.append("")
+            lines.append("Последние видео:")
+            for v in rv[:3]:
+                t = (v.get("title") or "")[:45]
+                lines.append(f"  - {t} (просм.: {v.get('views')})")
+        return "\n".join(lines)
+    except Exception as e:
+        return "Не удалось снять снапшот: %s" % e
+
 def main():
     # токен консультанта пишет клиенту; токен заявок пишет копию владельцу
     consult_token = os.environ.get("CONSULT_MAX_TOKEN", "")
@@ -183,7 +211,8 @@ def main():
             "и с вами свяжутся наши специалисты: обсудим, что даст автоматизация "
             "и как получить API канала для более глубокого анализа.")
 
-    # Таблица цифр — программно из снапшота, всегда видна клиенту
+    # Таблица цифр — ровными колонками, из снапшота (ОДИН раз в сообщении)
+    digits = ""
     try:
         with open("snapshot.json", encoding="utf-8") as f:
             snap = json.load(f)
@@ -191,18 +220,14 @@ def main():
     except Exception:
         digits = ""
 
-    # Фирменная шапка
-    BRAND = "── Студия автоматизации каналов и продуктов Артёма Райхерта ──"
-
+    # Строго по шаблону: заголовок → текст аудита → ОДНА таблица → вопрос
+    header = "🎁 Бесплатный аудит канала готов!"
     if audit:
-        to_client = ("🎁 Бесплатный аудит канала готов!\n\n" + BRAND + "\n\n" +
-                     audit + digits + COOP)
-        to_owner = ("🎁 Бесплатный аудит канала!\n\n" + BRAND + "\n\n" +
-                    audit + digits + "\n\n---\nСырые данные снапшота:\n" + text)
+        to_client = header + "\n\n" + audit + digits + COOP
     else:
-        to_client = ("🎁 Бесплатный аудит канала готов!\n\n" + BRAND + "\n\n" +
-                     text + COOP)
-        to_owner = to_client
+        to_client = header + "\n\n" + build_body_plain() + digits + COOP
+    # владельцу — то же (полные данные не дублируем отдельно)
+    to_owner = to_client
 
     # 1) клиенту (обязательно)
     try:
