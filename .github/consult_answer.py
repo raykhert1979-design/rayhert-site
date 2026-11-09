@@ -47,8 +47,8 @@ def get_history(limit=12):
         t = (m.get("body") or {}).get("text") or ""
         if not t:
             continue
-        rec = m.get("recipient") or {}
-        uid = str(rec.get("user_id") or "")
+        s = m.get("sender") or {}     # отправитель сообщения
+        uid = str(s.get("user_id") or "")
         role = "assistant" if uid == SELF else "user"
         out.append((role, t))
     out.reverse()  # от старых к новым
