@@ -1,0 +1,22 @@
+name: Контакты — ежедневная сводка
+
+on:
+  schedule:
+    - cron: '30 4 * * *'   # 07:30 по Москве (UTC+3)
+
+permissions:
+  contents: read
+
+jobs:
+  remind:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Забрать репозиторий
+        uses: actions/checkout@v4
+
+      - name: Отправить сводку контактов в MAX
+        env:
+          MAX_TOKEN: ${{ secrets.MAX_TOKEN }}
+          MAX_CHAT_ID: ${{ secrets.MAX_CHAT_ID }}
+        run: python3 .github/scripts/contacts_remind.py
