@@ -1,0 +1,73 @@
+name: Snapshot канала для аудита
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: Ссылка на канал (YouTube/Rutube/VK/Дзен/Telegram)
+        required: true
+      chat_id:
+        description: ID чата MAX, куда прислать результат
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Забрать репозиторий
+        uses: actions/checkout@v4
+
+      - name: Установить yt-dlp
+        run: |
+          pip install --quiet yt-dlp
+
+      - name: Снять снапшот канала
+        id: snap
+        env:
+          URL: ${{ github.event.inputs.url }}
+        run: |
+          python3 .github/scripts/channel_snapshot.py "$URL" > snapshot.json || echo "::warning::Снапшот не удался"
+          echo "result=готово" >> "$GITHUB_OUTPUT"
+
+      - name: Отправить результат в MAX
+        if: always()
+        env:
+          MAX_TOKEN: ${{ secrets.MAX_TOKEN }}
+          CHAT_ID: ${{ github.event.inputs.chat_id }}
+        run: |
+          python3 - <<'PY'
+          import json, os, urllib.request
+
+          token = os.environ["MAX_TOKEN"]
+          chat_id = os.environ["CHAT_ID"]
+          try:
+              data = json.load(open("snapshot.json", encoding="utf-8"))
+              text = "📊 Снапшот канала:\n"
+              for k, v in data.items():
+                  if v in (None, "", [], {}):
+                      continue
+                  if isinstance(v, (list, dict)):
+                      continue
+                  text += f"• {k}: {v}\n"
+              if data.get("recent_videos"):
+                  text += "\nПоследние видео:\n"
+                  for v in data["recent_videos"][:5]:
+                      t = (v.get("title") or "")[:50]
+                      text += f"  - {t} (просм.: {v.get('views')})\n"
+          except Exception as e:
+              text = "Не удалось снять снапшот: %s" % e
+          req = urllib.request.Request(
+              "https://platform-api.max.ru/messages?chat_id=%s" % chat_id,
+              data=json.dumps({"text": text}).encode(),
+              headers={"Authorization": "Bearer " + token, "Content-Type": "application/json"},
+              method="POST")
+          try:
+              with urllib.request.urlopen(req, timeout=30) as r:
+                  print("MAX ответ:", r.status)
+          except Exception as e:
+              print("MAX ERR:", e)
+PY
