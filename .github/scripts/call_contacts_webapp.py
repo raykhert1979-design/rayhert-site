@@ -8,6 +8,7 @@
 import os, json, ssl, urllib.request
 
 WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzw5B118oSOJT9IRLrvmJROeM_v4Z9CMrNIcUF-jQnytr67Zb-qKxXUWmuY5AOOqgFxvw/exec"
+ACCESS_KEY = "rt9k-c0n74k7s-2O2O-9o22"  # тот же ключ, что в Web App
 
 
 def ctx_no_verify():
@@ -40,6 +41,7 @@ def main():
         print("нет CHAT_ID, контакт не записываю")
         return
     payload = {
+        "key": ACCESS_KEY,
         "источник": os.environ.get("CONTACT_SOURCE", "аудит"),
         "chat_id": str(chat_id),
         "имя": os.environ.get("SENDER_NAME", ""),
