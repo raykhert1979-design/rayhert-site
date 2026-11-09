@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Отправка результата снапшота канала в MAX (вызывается из snapshot-audit.yml)."""
-import json, os, sys, urllib.request, urllib.error
+import json, os, sys, ssl, urllib.request, urllib.error
 
 def main():
     token = os.environ.get("MAX_TOKEN", "")
@@ -30,13 +30,16 @@ def main():
         text = "\n".join(lines)
     except Exception as e:
         text = "Не удалось снять снапшот: %s" % e
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
     req = urllib.request.Request(
-        "https://platform-api.max.ru/messages?chat_id=%s" % chat_id,
+        "https://platform-api2.max.ru/messages?chat_id=%s" % chat_id,
         data=json.dumps({"text": text}).encode("utf-8"),
-        headers={"Authorization": "Bearer " + token, "Content-Type": "application/json"},
+        headers={"Authorization": token, "Content-Type": "application/json"},
         method="POST")
     try:
-        with urllib.request.urlopen(req, timeout=30) as r:
+        with urllib.request.urlopen(req, timeout=30, context=ctx) as r:
             print("MAX ответ:", r.status)
     except urllib.error.HTTPError as e:
         print("MAX HTTP-ошибка:", e.code, e.read().decode("utf-8", "replace")[:200])
