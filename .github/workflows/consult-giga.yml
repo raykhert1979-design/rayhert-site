@@ -23,7 +23,7 @@ jobs:
       - name: GigaChat answer to MAX
         env:
           GIGA_SECRET: ${{ secrets.GIGA_SECRET }}
-          MAX_TOKEN: ${{ secrets.MAX_TOKEN }}
+          CONSULT_MAX_TOKEN: ${{ secrets.CONSULT_MAX_TOKEN }}
           TEXT: ${{ github.event.inputs.text }}
           CHAT_ID: ${{ github.event.inputs.chat_id }}
         run: python3 .github/consult_answer.py
