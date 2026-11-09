@@ -36,6 +36,8 @@ jobs:
       - name: Отправить результат в MAX
         if: always()
         env:
+          CONSULT_MAX_TOKEN: ${{ secrets.CONSULT_MAX_TOKEN }}
           MAX_TOKEN: ${{ secrets.MAX_TOKEN }}
           CHAT_ID: ${{ github.event.inputs.chat_id }}
+          OWNER_CHAT_ID: ${{ secrets.MAX_CHAT_ID }}
         run: python3 .github/scripts/snapshot_send.py
