@@ -36,7 +36,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           AUDIT_URL: ${{ github.event.inputs.text }}
-          AUDIT_CHAT: ${{ secrets.MAX_CHAT_ID }}
+          AUDIT_CHAT: ${{ github.event.inputs.chat_id }}
         run: |
           URL="${AUDIT_URL#URL: }"
           gh workflow run snapshot-audit.yml -f "url=$URL" -f "chat_id=$AUDIT_CHAT"
