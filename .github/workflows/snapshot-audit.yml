@@ -33,6 +33,19 @@ jobs:
           python3 .github/scripts/channel_snapshot.py "$URL" > snapshot.json || echo "::warning::Снапшот не удался"
           echo "result=готово" >> "$GITHUB_OUTPUT"
 
+      - name: Записать контакт клиента (после аудита)
+        if: always()
+        env:
+          CHAT_ID: ${{ github.event.inputs.chat_id }}
+          CONTACT_SOURCE: аудит
+          SENDER_NAME: ""
+          PLATFORM: ""
+          CHANNEL_URL: ${{ github.event.inputs.url }}
+          CONTACT_STATUS: аудит-получен
+          NEXT_STEP: ждём ответа клиента на предложение
+          HISTORY: аудит отправлен клиенту в MAX
+        run: python3 .github/scripts/call_contacts_webapp.py
+
       - name: Отправить результат в MAX
         if: always()
         env:
