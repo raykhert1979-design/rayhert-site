@@ -40,3 +40,16 @@ jobs:
         run: |
           URL="${AUDIT_URL#URL: }"
           gh workflow run snapshot-audit.yml -f "url=$URL" -f "chat_id=$AUDIT_CHAT"
+
+      - name: Записать контакт клиента (аудит канала)
+        if: ${{ startsWith(github.event.inputs.text, 'URL:') }}
+        env:
+          CHAT_ID: ${{ github.event.inputs.chat_id }}
+          CONTACT_SOURCE: аудит
+          SENDER_NAME: ${{ github.event.inputs.sender_name }}
+          PLATFORM: ""
+          CHANNEL_URL: ${{ github.event.inputs.text }}
+          CONTACT_STATUS: аудит-запрошен
+          NEXT_STEP: проведён аудит канала
+          HISTORY: запрос бесплатного аудита
+        run: python3 .github/scripts/call_contacts_webapp.py
