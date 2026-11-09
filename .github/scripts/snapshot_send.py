@@ -186,6 +186,105 @@ def build_body_plain():
     except Exception as e:
         return "Не удалось снять снапшот: %s" % e
 
+def build_human_audit(snap, snap_text=""):
+    """Живой экспресс-аудит: вступление, ✅ что хорошо, ❗ над чем поработать, вывод.
+    Генерируется из цифр снапшота — без облака, всегда доступен."""
+    name = (snap.get("name") or snap.get("title_meta") or snap.get("og_title") or "").strip()
+    plat = str(snap.get("platform") or "").lower()
+    plat_ru = {"rutube": "Rutube", "youtube": "YouTube", "vk": "ВКонтакте",
+               "dzen": "Дзен", "telegram": "Telegram"}.get(plat, plat.upper() or "площадке")
+    subs_raw = snap.get("subscribers") or snap.get("members")
+    subs = str(subs_raw).strip() if subs_raw else ""
+
+    def num(v):
+        try:
+            return int(str(v).replace(" ", "").replace("\u00a0", "").replace("К", "000").replace("к", "000").replace(",", "").replace(".", ""))
+        except Exception:
+            return None
+
+    def parse_count(s):
+        # "4 395" -> 4395 ; "58,4К" -> 58400 ; "3K" -> 3000
+        if not s:
+            return None
+        s = str(s).strip().replace("\u00a0", " ").replace(" ", "")
+        try:
+            if "К" in s.upper():
+                return int(float(s.upper().replace("К", "")) * 1000)
+            return int(float(s.replace(",", ".")))
+        except Exception:
+            return None
+
+    content_count = None
+    for k in ("video_count", "video_count_meta", "posts_count"):
+        if snap.get(k):
+            content_count = parse_count(str(snap.get(k)))
+            if content_count:
+                break
+
+    views_sum = None
+    rv = snap.get("recent_videos") or []
+    views_list = []
+    for v in rv:
+        tmp = v.get("views")
+        n = num(tmp) if tmp is not None else None
+        if n:
+            views_list.append(n)
+    if views_list:
+        views_sum = sum(views_list)
+
+    intro = f'Мы проанализировали ваш канал «{name[:60]}» на {plat_ru} и готовы поделиться результатами бесплатного экспресс-аудита.'
+    good = []
+    improve = []
+
+    # аналитика по цифрам
+    subs_n = parse_count(subs)
+    if subs_n:
+        if subs_n >= 50000:
+            good.append("У вас уже сформировалась крупная аудитория — это сильный ресурс для развития канала и привлечения партнёрств.")
+        elif subs_n >= 5000:
+            good.append("У вас собранная база подписчиков — фундамент, на котором можно строить рост и монетизацию.")
+        elif subs_n >= 500:
+            good.append("У вас есть своя аудитория, которая подписана и ждёт новых публикаций — хорошая база для старта.")
+        else:
+            improve.append("Аудитория пока небольшая — стоит активнее привлекать подписчиков: продвижение новых роликов и перекрёстные ссылки между площадками.")
+    else:
+        improve.append("Прирост подписчиков стоит вывести в приоритет — это главный показатель здоровья канала.")
+
+    if content_count:
+        if content_count >= 1000:
+            good.append(f"Содержательный архив — {content_count} публикаций. Такой объём контента помогает зрителям находить канал и оставаться надолго.")
+        elif content_count >= 100:
+            good.append(f"Уже {content_count} публикаций — регулярный контент поддерживает интерес аудитории.")
+        else:
+            improve.append(f"Публикаций пока немного ({content_count}) — для роста нужно наращивать регулярность и объём.")
+
+    if views_list:
+        avg = views_sum / len(views_list)
+        if avg >= 1000:
+            good.append("Свежие ролики стабильно собирают просмотры — контент попадает в рекомендации площадки.")
+        elif avg >= 200:
+            good.append(f"Свежие видео набирают в среднем {int(avg)} просмотров — это рабочая точка для роста.")
+        else:
+            improve.append(f"Просмотры последних роликов пока скромные (в среднем {int(avg)}) — стоит поработать над названиями, обложками и продвижением, чтобы видео чаще попадали в рекомендации.")
+    else:
+        improve.append("Отслеживайте просмотры каждого нового выпуска — это покажет, какой контент заходит аудитории.")
+
+    improve.append("Регулярность публикаций — ключ к росту: чем стабильнее вы выходите, тем охотнее площадка продвигает канал и тем активнее возвращаются зрители.")
+
+    # добиваем до равновесия
+    while len(good) < 2:
+        good.append("Тематика канала понятна и нишевая — есть своя аудитория и потенциал для узнаваемости.")
+    while len(improve) > 3:
+        improve.pop()
+
+    parts = [intro, "\n✅ Что хорошо:"]
+    parts += ["- " + g for g in good[:2]]
+    parts.append("\n❗ Над чем стоит поработать:")
+    parts += ["- " + p for p in improve[:2]]
+    parts.append("\nЕсли хотите узнать больше деталей об улучшении показателей своего канала, "
+                 "мы можем провести подробный анализ и предложить конкретные рекомендации.")
+    return "\n".join(parts)
+
 def main():
     # токен консультанта пишет клиенту; токен заявок пишет копию владельцу
     consult_token = os.environ.get("CONSULT_MAX_TOKEN", "")
@@ -220,12 +319,18 @@ def main():
     except Exception:
         digits = ""
 
-    # Строго по шаблону: заголовок → текст аудита → ОДНА таблица → вопрос
+    # Строго по шаблону: заголовок → аудит (GigaChat или человеческий fallback) → ОДНА таблица → вопрос
     header = "🎁 Бесплатный аудит канала готов!"
     if audit:
-        to_client = header + "\n\n" + audit + digits + COOP
+        body = audit
     else:
-        to_client = header + "\n\n" + build_body_plain() + digits + COOP
+        try:
+            with open("snapshot.json", encoding="utf-8") as f:
+                snap = json.load(f)
+            body = build_human_audit(snap, text)
+        except Exception:
+            body = build_body_plain()
+    to_client = header + "\n\n" + body + digits + COOP
     # владельцу — то же (полные данные не дублируем отдельно)
     to_owner = to_client
 
