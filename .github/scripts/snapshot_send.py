@@ -178,9 +178,17 @@ def main():
             "и с вами свяжутся наши специалисты: обсудим, что даст автоматизация "
             "и как получить API канала для более глубокого анализа.")
 
+    # Таблица цифр — программно из снапшота, всегда видна клиенту
+    try:
+        with open("snapshot.json", encoding="utf-8") as f:
+            snap = json.load(f)
+        digits = "\n\n📈 Цифры по каналу:\n" + build_table_text(snap)
+    except Exception:
+        digits = ""
+
     if audit:
-        to_client = "🎁 Бесплатный аудит канала готов!\n\n" + audit + COOP
-        to_owner = "🎁 Бесплатный аудит канала!\n\n" + audit + "\n\n---\nСырые данные снапшота:\n" + text
+        to_client = "🎁 Бесплатный аудит канала готов!\n\n" + audit + digits + COOP
+        to_owner = "🎁 Бесплатный аудит канала!\n\n" + audit + digits + "\n\n---\nСырые данные снапшота:\n" + text
     else:
         to_client = "🎁 Бесплатный аудит канала готов!\n\n" + text + COOP
         to_owner = to_client
