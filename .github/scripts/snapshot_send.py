@@ -114,15 +114,20 @@ def build_metrics_rows(data):
     return rows
 
 def build_table_text(data):
-    """Таблица цифр: показатели и объяснения."""
+    """Таблица цифр в рамке: показатели и объяснения."""
     rows = build_metrics_rows(data)
     if not rows:
         return "Цифры по каналу не собраны."
     w1 = max(len(r[0]) for r in rows) + 1
     w2 = max(len(r[1]) for r in rows) + 1
-    out = []
+    w3 = max(len(r[2]) for r in rows)
+    line = "┌" + "─" * (w1 + w2 + w3 + 4) + "┐"
+    out = [line]
     for a, b, c in rows:
-        out.append(f"{a:<{w1}} {b:<{w2}} {c}")
+        # обрезаем пояснение до ширины
+        c = c[:w3]
+        out.append(f"│ {a:<{w1-1}} {b:<{w2-1}} {c:<{w3}} │")
+    out.append("└" + "─" * (w1 + w2 + w3 + 4) + "┘")
     return "\n".join(out)
 
 def build_text():
@@ -186,11 +191,17 @@ def main():
     except Exception:
         digits = ""
 
+    # Фирменная шапка
+    BRAND = "── Студия автоматизации каналов и продуктов Артёма Райхерта ──"
+
     if audit:
-        to_client = "🎁 Бесплатный аудит канала готов!\n\n" + audit + digits + COOP
-        to_owner = "🎁 Бесплатный аудит канала!\n\n" + audit + digits + "\n\n---\nСырые данные снапшота:\n" + text
+        to_client = ("🎁 Бесплатный аудит канала готов!\n\n" + BRAND + "\n\n" +
+                     audit + digits + COOP)
+        to_owner = ("🎁 Бесплатный аудит канала!\n\n" + BRAND + "\n\n" +
+                    audit + digits + "\n\n---\nСырые данные снапшота:\n" + text)
     else:
-        to_client = "🎁 Бесплатный аудит канала готов!\n\n" + text + COOP
+        to_client = ("🎁 Бесплатный аудит канала готов!\n\n" + BRAND + "\n\n" +
+                     text + COOP)
         to_owner = to_client
 
     # 1) клиенту (обязательно)
