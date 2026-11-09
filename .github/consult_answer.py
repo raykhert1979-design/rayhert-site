@@ -24,6 +24,13 @@ KB = """СТУДИЯ АРТЁМА РАЙХЕРТА: автоматизация �
 КЕЙСЫ: радио «Деревенский шансон» в RuStore; Дзен «Митрофановна» 58 тыс подписчиков; VK группа; YouTube «Ансамбль Митрофановна» 55,9 тыс, 11,4 млн просмотров.
 ПРАВИЛА: отвечай от «мы», коротко, тепло, по делу. Цены — вилки из базы, точная сумма в смете. Предлагай бесплатный аудит канала за 15 минут. Не выдумывай цены, сроки, факты. iOS не делаем, фокус Android/RuStore."""
 
+def send_max(msg):
+    url3 = "https://platform-api2.max.ru/messages?chat_id=" + urllib.parse.quote(str(chat_id))
+    req3 = urllib.request.Request(url3, data=json.dumps({"text": msg}).encode(), method="POST",
+        headers={"Authorization": max_token, "Content-Type": "application/json"})
+    with urllib.request.urlopen(req3, timeout=30, context=ctx_no_verify()) as r:
+        return r.status
+
 def giga_answer(user_text):
     data = urllib.parse.urlencode({"scope": "GIGACHAT_API_PERS"}).encode()
     req = urllib.request.Request("https://ngw.devices.sberbank.ru:9443/api/v2/oauth",
@@ -46,10 +53,14 @@ def giga_answer(user_text):
         d = json.loads(r.read().decode())
         return d["choices"][0]["message"]["content"].strip()
 
-answer = giga_answer(text)
-url3 = "https://platform-api.max.ru/messages?chat_id=" + urllib.parse.quote(str(chat_id))
-req3 = urllib.request.Request(url3, data=json.dumps({"text": answer}).encode(), method="POST",
-    headers={"Authorization": max_token, "Content-Type": "application/json"})
-with urllib.request.urlopen(req3, timeout=30, context=ctx_no_verify()) as r:
-    print("MAX send", r.status)
-print("ANSWER OK")
+# Ветка бесплатного аудита: клиент прислал ссылку на канал вида "URL: https://..."
+if text.strip().startswith("URL:"):
+    answer = ("Спасибо! Приняли ссылку на канал — готовим бесплатный аудит за 15 минут. "
+              "Пришлём сюда же краткий разбор: подписчики, активность, что можно улучшить. "
+              "Если удобнее — можем обсудить по телефону, скажите номер.")
+else:
+    answer = giga_answer(text)
+
+st = send_max(answer)
+print("MAX send", st)
+print("ANSWER OK" if st == 200 else "ANSWER SEND %s" % st)
