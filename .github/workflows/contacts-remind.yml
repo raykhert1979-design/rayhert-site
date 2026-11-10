@@ -19,4 +19,5 @@ jobs:
         env:
           MAX_TOKEN: ${{ secrets.MAX_TOKEN }}
           MAX_CHAT_ID: ${{ secrets.MAX_CHAT_ID }}
+          CONTACTS_KEY: ${{ secrets.CONTACTS_KEY }}
         run: python3 .github/scripts/contacts_remind.py
