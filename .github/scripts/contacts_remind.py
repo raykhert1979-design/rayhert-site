@@ -8,7 +8,7 @@
 import os, json, ssl, urllib.request, urllib.parse
 
 WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzw5B118oSOJT9IRLrvmJROeM_v4Z9CMrNIcUF-jQnytr67Zb-qKxXUWmuY5AOOqgFxvw/exec"
-ACCESS_KEY = "rt9k-c0n74k7s-2O2O-9o22"
+ACCESS_KEY = os.environ.get("CONTACTS_KEY", "")  # секрет из GitHub Secrets, не хранить в репо
 MAX_API = "https://platform-api2.max.ru/messages"
 
 
